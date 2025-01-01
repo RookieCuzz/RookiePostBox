@@ -1,11 +1,14 @@
 package com.cuzz.rookiepostbox;
 
+import com.cuzz.rookiepostbox.menu.anvil_input_menu.AnvilInputMenu;
+import com.cuzz.rookiepostbox.menu.pagination.PaginationExampleMenu;
 import com.cuzz.rookiepostbox.model.Package;
 import com.cuzz.rookiepostbox.model.PostBox;
 import com.cuzz.rookiepostbox.database.MongoDBManager;
-import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.event.PacketListenerPriority;
-import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
+//import com.github.retrooper.packetevents.PacketEvents;
+//import com.github.retrooper.packetevents.event.PacketListenerPriority;
+//import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
+import nl.odalitadevelopments.menus.OdalitaMenus;
 import org.bson.types.ObjectId;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -28,23 +31,19 @@ public final class RookiePostBox extends JavaPlugin implements Listener {
 
 
     private static   RookiePostBox instance;
+    private OdalitaMenus odalitaMenus;
 
-    public static HashMap<Player,Player> giftInv=new HashMap<>();
+    public OdalitaMenus getOdalitaMenus() {
+        return odalitaMenus;
+    }
+
+    MongoDBManager mongoDBManager = new MongoDBManager();
     @Override
     public void onEnable() {
         // Plugin startup logic
-        PacketEvents.setAPI(SpigotPacketEventsBuilder.build(this));
-        //On Bukkit, calling this here is essential, hence the name "load"
-        PacketEvents.getAPI().load();
-        PacketEvents.getAPI().getEventManager().registerListener(
-                new PacketEventsPacketListener(), PacketListenerPriority.NORMAL);
+        odalitaMenus = OdalitaMenus.createInstance(this);
 
-        PacketEvents.getAPI().init();
-
-
-
-
-        this.getCommand("test").setExecutor(new TestCommandExecutor());
+        this.getCommand("RookiePostBox").setExecutor(new TestCommandExecutor());
         Bukkit.getPluginManager().registerEvents(this, this);
         this.instance=this;
     }
@@ -55,52 +54,41 @@ public final class RookiePostBox extends JavaPlugin implements Listener {
         Player player = event.getPlayer();
         String message = event.getMessage();
 
-        // 检查玩家是否输入了 "我要测试"
-        if (message.equals("我要测试")) {
-            // 在主线程上打开菜单（因为聊天事件是异步的）
-            Bukkit.getScheduler().runTask(this, () -> {
-                // 创建并打开自定义菜单
-                MenuTemplate menuTemplate = new MenuTemplate();
-                Inventory menu = menuTemplate.getMenu();
-                System.out.println("我执行了几次");
-                player.openInventory(menu);
-            });
-        }
     }
     public static RookiePostBox getInstance() {
         return instance;
     }
 
-    @EventHandler
-    public void onInvClose(InventoryCloseEvent uiCloseEvent){
-        Player player = (Player) uiCloseEvent.getPlayer();
-        player.openInventory(uiCloseEvent.getInventory());
-        player.sendMessage("不能关闭！");
-        String title = uiCloseEvent.getView().getTitle();
-        if (title.equalsIgnoreCase("test")){
-            uiCloseEvent.getPlayer().sendMessage("邮件已经发送给对方");
-            //发邮件逻辑
-            Player sender =(Player) uiCloseEvent.getPlayer();
-            ItemStack[] contents = uiCloseEvent.getInventory().getContents();
-            Package aPackage = Package.builder().createTime(new Date()).message("新年好!").build();
-            aPackage.setUpItemContent(contents);
-            Player receiver = RookiePostBox.giftInv.get(sender);
-            aPackage.setUpOtherInfo(sender,RookiePostBox.giftInv.get(sender));
-            PostBox postBox = PostBox.builder().ownerUUID(receiver.getUniqueId().toString()).build();
-            MongoDBManager manager = new MongoDBManager();
-            manager.connect("mongodb://localhost:27017", "postBox");
-            PostBox postBoxById = manager.getPostBoxById(receiver.getUniqueId().toString());
-            manager.insertPackage(aPackage);
-            ObjectId id = aPackage.getId();
-            postBox.addPackage(aPackage);
-            if (postBoxById==null){
-                manager.insertBox(postBox);
-            }
-            manager.close();
-        }
-
-
-    }
+//    @EventHandler
+//    public void onInvClose(InventoryCloseEvent uiCloseEvent){
+//        Player player = (Player) uiCloseEvent.getPlayer();
+//        player.openInventory(uiCloseEvent.getInventory());
+//        player.sendMessage("不能关闭！");
+//        String title = uiCloseEvent.getView().getTitle();
+//        if (title.equalsIgnoreCase("test")){
+//            uiCloseEvent.getPlayer().sendMessage("邮件已经发送给对方");
+//            //发邮件逻辑
+//            Player sender =(Player) uiCloseEvent.getPlayer();
+//            ItemStack[] contents = uiCloseEvent.getInventory().getContents();
+//            Package aPackage = Package.builder().createTime(new Date()).message("新年好!").build();
+//            aPackage.setUpItemContent(contents);
+//            Player receiver = RookiePostBox.giftInv.get(sender);
+//            aPackage.setUpOtherInfo(sender,RookiePostBox.giftInv.get(sender));
+//            PostBox postBox = PostBox.builder().ownerUUID(receiver.getUniqueId().toString()).build();
+//            MongoDBManager manager = new MongoDBManager();
+//            manager.connect("mongodb://localhost:27017", "postBox");
+//            PostBox postBoxById = manager.getPostBoxById(receiver.getUniqueId().toString());
+//            manager.insertPackage(aPackage);
+//            ObjectId id = aPackage.getId();
+//            postBox.addPackage(aPackage);
+//            if (postBoxById==null){
+//                manager.insertBox(postBox);
+//            }
+//            manager.close();
+//        }
+//
+//
+//    }
     // 定义 /test 命令的处理逻辑
     public class TestCommandExecutor implements CommandExecutor {
 
@@ -109,13 +97,32 @@ public final class RookiePostBox extends JavaPlugin implements Listener {
             if (sender instanceof Player) {
                 Player player = (Player) sender;
                 // 当玩家输入 /test 时发送消息 666
-                if (args.length<1){
-                    System.out.println("请输入/test 接收者id");
+                if (args[0].equalsIgnoreCase("menu")){
+                    odalitaMenus.openMenu(new PaginationExampleMenu(), player);
+                }
+                if (args[0].equalsIgnoreCase("write")){
+                    odalitaMenus.openMenu(new AnvilInputMenu((input) -> {
+                        player.sendMessage("You entered: " + input);
+                    }), player);
+                }
+                if (args.length<2){
+                    System.out.println("请输入/test save 消息内容");
                     return false;
                 }
-                String receiver = args[0];
-                RookiePostBox.giftInv.put(player,Bukkit.getPlayer(receiver));
-                Test.openDiamondInventory(player);
+                if (args[0].equalsIgnoreCase("save")){
+
+
+                    Package.PackageBuilder time = Package.builder().ownerUUID(String.valueOf(player.getUniqueId()))
+                            .senderName(player.getName())
+                            .message(args[1])
+                            .createTime(new Date());
+                    ItemStack item = player.getInventory().getItemInMainHand();
+
+
+
+
+                }
+
                 return true;
             }
             return false;

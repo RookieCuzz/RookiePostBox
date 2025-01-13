@@ -5,6 +5,7 @@ api-version: '1.20'
 load: STARTUP
 depends:
   - OdalitaMenus
+  - RookieFonts
 commands:
   RookiePostBox:
     permission: RookiePostBox.*

@@ -88,12 +88,19 @@
             <version>1.21-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
-
+        <dependency>
+            <groupId>com.cuzz</groupId>
+            <artifactId>RookieFont</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/libs/RookieFonts-1.0-SNAPSHOT-all.jar</systemPath>
+        </dependency>
         <dependency>
             <groupId>io.github.odalita-developments.odalitamenus</groupId>
             <artifactId>core</artifactId>
             <version>0.5.13</version>
-            <scope>compile</scope>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/libs/core-0.5.13.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>org.jetbrains</groupId>
@@ -120,9 +127,9 @@
         </dependency>
         <dependency>
             <groupId>com.github.retrooper</groupId>
-            <artifactId>packetevents-spigot </artifactId>
-            <version>2.5.0</version>
-            <scope>provided</scope>
+            <artifactId>packetevents-spigot</artifactId>
+            <version>2.7.0</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>

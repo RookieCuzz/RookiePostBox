@@ -8,6 +8,10 @@ import com.cuzz.rookiepostbox.database.MongoDBManager;
 //import com.github.retrooper.packetevents.PacketEvents;
 //import com.github.retrooper.packetevents.event.PacketListenerPriority;
 //import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
+import com.cuzz.rookiepostbox.test.PacketEventsPacketListener;
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.event.PacketListenerPriority;
+import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import nl.odalitadevelopments.menus.OdalitaMenus;
 import org.bson.types.ObjectId;
 import org.bukkit.Bukkit;
@@ -17,6 +21,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.inventory.Inventory;
@@ -42,12 +47,33 @@ public final class RookiePostBox extends JavaPlugin implements Listener {
     public void onEnable() {
         // Plugin startup logic
         odalitaMenus = OdalitaMenus.createInstance(this);
-
         this.getCommand("RookiePostBox").setExecutor(new TestCommandExecutor());
         Bukkit.getPluginManager().registerEvents(this, this);
         this.instance=this;
+        setupPacket();
     }
+    public  void setupPacket(){
+        try {
+                PacketEvents.setAPI(SpigotPacketEventsBuilder.build(this));
+                //On Bukkit, calling this here is essential, hence the name "load"
+                PacketEvents.getAPI().load();
+//                PacketEvents.getAPI().getEventManager().registerListener(
+//                        new PacketEventsPacketListener(), PacketListenerPriority.NORMAL);
 
+                PacketEvents.getAPI().init();
+                // 注册 PacketListener
+
+//            // 初始化 EntityLib
+//            SpigotEntityLibPlatform spigotEntityLibPlatform = new SpigotEntityLibPlatform(this);
+//            APIConfig aPIConfig = new APIConfig(PacketEvents.getAPI()).usePlatformLogger();
+//            EntityLib.init(spigotEntityLibPlatform, aPIConfig);
+
+            getLogger().info("Holograms plugin enabled!");
+        } catch (Exception e) {
+            getLogger().severe("Error enabling Holograms plugin: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
     // 监听玩家聊天事件
     @EventHandler
     public void onPlayerChat(AsyncPlayerChatEvent event) {
@@ -91,7 +117,7 @@ public final class RookiePostBox extends JavaPlugin implements Listener {
 //    }
     // 定义 /test 命令的处理逻辑
     public class TestCommandExecutor implements CommandExecutor {
-
+//    EntityShootBowEvent
         @Override
         public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
             if (sender instanceof Player) {

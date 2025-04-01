@@ -11,7 +11,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
-@Entity(discriminator ="adminItem")
+@Entity(value="abstractItems", discriminator="adminItem")
 @Data
 @AllArgsConstructor // 生成全参构造函数
 @NoArgsConstructor

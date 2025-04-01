@@ -7,6 +7,7 @@ import com.cuzz.rookiepostbox.model.item.NonAdminItem;
 import com.mongodb.DBRef;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
+import com.mongodb.client.result.UpdateResult;
 import dev.morphia.Morphia;
 import dev.morphia.Datastore;
 
@@ -15,6 +16,7 @@ import dev.morphia.query.experimental.filters.Filter;
 import dev.morphia.query.experimental.filters.Filters;
 import dev.morphia.query.experimental.updates.UpdateOperator;
 import dev.morphia.query.experimental.updates.UpdateOperators;
+import org.bson.types.ObjectId;
 import org.bukkit.entity.Player;
 
 import java.util.Date;
@@ -38,7 +40,6 @@ public class MongoDBManager implements Dao {
 ////                    .applyDocumentValidations(true);
 //            // 创建 Datastore，Morphia 会自动扫描并映射所有实体类
             datastore = Morphia.createDatastore(mongoClient,dbName);
-            datastore.getMapper().mapPackage("com.cuzz.rookiepostbox");
             datastore.getMapper().map(AdminItem.class);
             datastore.getMapper().map(PostBox.class);
             datastore.getMapper().map(Package.class);
@@ -55,8 +56,17 @@ public class MongoDBManager implements Dao {
     @Override
     public boolean addPackageToPostBox(Package packageX, String uuid, boolean isOnline) {
         if (datastore != null) {
-            DBRef dbRef = new DBRef("packages",packageX.getId());
+            Package aPackage = savePackageToDB(packageX);
+            DBRef dbRef = new DBRef("somePackage",aPackage.getId());
             UpdateOperator pullOperator = UpdateOperators.addToSet("packages",dbRef);
+            PostBox postBoxByUUID = getPostBoxByUUID(uuid);
+            if (postBoxByUUID==null){
+                createNewPostBox(uuid,"测试用户");
+            }
+            if (Cache.postBoxes.get(uuid)!=null){
+                Cache.postBoxes.remove(uuid);
+
+            }
             this.datastore.find(PostBox.class).filter(Filters.eq("_id",uuid)).update(pullOperator).execute();
             return true;
         } else {
@@ -64,7 +74,28 @@ public class MongoDBManager implements Dao {
             return false;
         }
     }
+    @Override
+    public boolean addPackageToPostBox(Package packageX, Player player, boolean isOnline) {
+        if (datastore != null) {
+            Package aPackage = savePackageToDB(packageX);
+            DBRef dbRef = new DBRef("somePackage",aPackage.getId());
+            UpdateOperator pullOperator = UpdateOperators.addToSet("packages",dbRef);
+            String uuid = player.getUniqueId().toString();
+            PostBox postBoxByUUID = getPostBoxByUUID(uuid);
+            if (postBoxByUUID==null){
+                createNewPostBox(uuid,"测试用户");
+            }
+            if (Cache.postBoxes.get(player.getName())!=null){
+                Cache.postBoxes.remove(player.getName());
 
+            }
+            this.datastore.find(PostBox.class).filter(Filters.eq("_id",uuid)).update(pullOperator).execute();
+            return true;
+        } else {
+            System.err.println("Datastore is not initialized.");
+            return false;
+        }
+    }
 
     // 关闭 MongoDB 连接
     public void close() {
@@ -159,14 +190,13 @@ public class MongoDBManager implements Dao {
         return this.getPostBoxByUUID(player.getUniqueId().toString());
 
     }
-
     @Override
     public boolean deletePackageFromPostBox(Package packageX, PostBox postBox) {
         String ownerUUID = postBox.getOwnerUUID();
         if (datastore != null) {
-            DBRef dbRef = new DBRef("packages", packageX.getId());
+//            DBRef dbRef = new DBRef("packages", packageX.getId());
             Filter filter = Filters.and(
-                    Filters.eq("$ref", "packages"),
+//                    Filters.eq("$ref", "packages"),
                     Filters.eq("$id", packageX.getId())
             );
             // 创建过滤条件，用于匹配要移除的 Package 引用
@@ -177,8 +207,29 @@ public class MongoDBManager implements Dao {
             System.err.println("Datastore is not initialized.");
             return false;
         }
-
     }
+    @Override
+    public boolean deletePackageFromPostBox(String packageId, PostBox postBox) {
+        String ownerUUID = postBox.getOwnerUUID();
+        ObjectId objectId = new ObjectId(packageId);
+        if (datastore != null) {
+            Filter filter = Filters.and(
+                    Filters.eq("$ref", "somePackage"),
+                    Filters.eq("$id",objectId)
+            );
+            // 创建过滤条件，用于匹配要移除的 Package 引用
+            UpdateOperator pullOperator = UpdateOperators.pull("packages", filter);
+            UpdateResult id = this.datastore.find(PostBox.class).filter(Filters.eq("_id", ownerUUID)).update(pullOperator).execute();
+            postBox.deletePackage(packageId);
+            System.out.println("删除—————————————————————— "+id.getModifiedCount());
+            return true;
+        } else {
+            System.err.println("Datastore is not initialized.");
+            return false;
+        }
+    }
+
+
 
     @Override
     public boolean deletePackageFromPostBox(Package packageX, String uuid) {
@@ -196,4 +247,15 @@ public class MongoDBManager implements Dao {
             return null;
         }
     }
+
+    @Override
+    public PostBox savePostBoxToDB(PostBox postBox) {
+        if (datastore != null) {
+            return this.datastore.save(postBox);
+        } else {
+            System.err.println("Datastore is not initialized.");
+            return null;
+        }
+    }
+
 }

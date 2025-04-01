@@ -31,6 +31,20 @@ public abstract class AbstractItem implements SerializeItem {
 
     }
 
+    public ItemStack getBukkitItem(){
+
+        ItemStack itemStack = null;
+        try {
+            itemStack = deserializeItemStackFromBase64(this.base64Item);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+        return itemStack;
+    }
+
     public AbstractItem(ItemStack itemStack, @Nullable String itemDisplayName){
         this.bukkitItem=itemStack;
         this.base64Item=this.serializeItemStackToBase64(itemStack);

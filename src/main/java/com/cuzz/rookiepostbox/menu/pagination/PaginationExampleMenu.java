@@ -1,6 +1,10 @@
 package com.cuzz.rookiepostbox.menu.pagination;
 import com.cuzz.rookiepostbox.RookiePostBox;
+import com.cuzz.rookiepostbox.database.Cache;
 import com.cuzz.rookiepostbox.menu.common.ItemBuilder;
+import com.cuzz.rookiepostbox.model.Package;
+import com.cuzz.rookiepostbox.model.PostBox;
+import com.cuzz.rookiepostbox.model.item.AbstractItem;
 import me.trytofeel.rookieFonts.manager.TemplateManager;
 import me.trytofeel.rookieFonts.models.Template;
 import net.kyori.adventure.text.Component;
@@ -28,8 +32,14 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.util.io.BukkitObjectInputStream;
 import org.jetbrains.annotations.NotNull;
+import org.bukkit.NamespacedKey;
+import org.bukkit.persistence.PersistentDataType;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.*;
 import java.util.function.Supplier;
 
@@ -39,6 +49,14 @@ import java.util.function.Supplier;
 )
 public final class PaginationExampleMenu implements PlayerMenuProvider {
 
+    public ItemStack deserializeItemStackFromBase64(String base64) throws IOException, ClassNotFoundException {
+        byte[] data = Base64.getDecoder().decode(base64);
+        ByteArrayInputStream byteIn = new ByteArrayInputStream(data);
+        BukkitObjectInputStream in = new BukkitObjectInputStream(byteIn);
+        ItemStack item = (ItemStack) in.readObject();
+        in.close();
+        return item;
+    }
     public static Map<Player,Pagination> cacheMenu;
 
     static List<ItemStack> list =new ArrayList<>();
@@ -69,13 +87,40 @@ public final class PaginationExampleMenu implements PlayerMenuProvider {
     Pagination pagination;
     public void handler(InventoryClickEvent event){
 
-        Player whoClicked = (Player)event.getWhoClicked();
-        String name = whoClicked.getName();
-        whoClicked.sendMessage(">>>"+ name+ "你点你马呢"+event.getCurrentItem().getItemMeta().getDisplayName());
+        Player player = (Player)event.getWhoClicked();
+        String name = player.getName();
+        player.sendMessage(">>>"+ name+ "你点你马呢"+event.getCurrentItem().getItemMeta().getDisplayName());
         ItemStack currentItem = event.getCurrentItem();
         Optional.of(currentItem).ifPresent(
                 (itemStack)->{
-                    list.remove(itemStack);
+
+                    ItemMeta itemMeta = itemStack.getItemMeta();
+                    PersistentDataContainer persistentDataContainer = itemMeta.getPersistentDataContainer();
+
+                    // 创建一个 NamespacedKey
+                    NamespacedKey key = new NamespacedKey("rpostbox", "packagedisplay");
+                    NamespacedKey base64Key = new NamespacedKey("rpostbox", "realItemBase64");
+                    // 设置值
+                    String packageId = persistentDataContainer.get(key, PersistentDataType.STRING);
+                    PostBox playerPostBox = Cache.postBoxes.get(player.getName());
+                    if (playerPostBox== null){
+                        playerPostBox = RookiePostBox.getInstance().getMongoDBManager().getPostBoxByPlayer(player);
+//                        Cache.postBoxes.put(player.getName(),playerPostBox);
+                    }
+//                    String realItemBase64 = persistentDataContainer.get(base64Key, PersistentDataType.STRING);
+//                    try {
+//                        player.getInventory().addItem(deserializeItemStackFromBase64(realItemBase64));
+//                    } catch (IOException e) {
+//                        throw new RuntimeException(e);
+//                    } catch (ClassNotFoundException e) {
+//                        throw new RuntimeException(e);
+//                    }
+
+                    player.sendMessage(ChatColor.GREEN+ " 东西不给你！搭12315投诉吧");
+                    RookiePostBox.getInstance().getMongoDBManager().deletePackageFromPostBox(packageId,playerPostBox);
+//                    playerPostBox.deletePackage(packageId);
+//                    RookiePostBox.getInstance().getMongoDBManager().savePostBoxToDB(playerPostBox);
+//                    System.out.println("删除包裹");
                 }
         );
         int startSlot = pagination.iterator().getStartSlotPos().getSlot();
@@ -93,12 +138,57 @@ public final class PaginationExampleMenu implements PlayerMenuProvider {
             currentPageX =pagination.currentPage();
         }
 
-        MenuSession openMenuSession = RookiePostBox.getInstance().getOdalitaMenus().getOpenMenuSession(whoClicked.getPlayer());
+        MenuSession openMenuSession = RookiePostBox.getInstance().getOdalitaMenus().getOpenMenuSession(player.getPlayer());
 
-        RookiePostBox.getInstance().getOdalitaMenus().openMenuBuilder(new PaginationExampleMenu(), (Player) whoClicked)
+        RookiePostBox.getInstance().getOdalitaMenus().openMenuBuilder(new PaginationExampleMenu(), (Player) player)
                 .pagination("example_pagination", currentPageX) // Use same id as provided in the menu
                 .open();
     }
+//    @Override
+//    public void onLoad(@NotNull Player player, @NotNull MenuContents contents) {
+//
+//        MenuIterator  iterator = contents.createIterator("TESTP", MenuIteratorType.HORIZONTAL, 2, 0);
+//        iterator.blacklist(9,18,27,36,17,26,35,45);
+//        pagination = contents.pagination("example_pagination", 21) // 28 is items per page
+//                .asyncPageSwitching(false) // Optionally, default is false
+//                .iterator(iterator)
+//                .create();
+//        PostBox playerPostBox = Cache.postBoxes.get(player.getName());
+//        if (playerPostBox== null){
+//            playerPostBox = RookiePostBox.getInstance().getMongoDBManager().getPostBoxByPlayer(player);
+//            Cache.postBoxes.put(player.getName(),playerPostBox);
+//        }
+//        List<Package> packages = playerPostBox.getPackages();
+//
+//        for (Package packagex:packages) {
+//            pagination.addItem(() -> {
+//                ItemStack bukkitItem = packagex.getItemContent().get(0).getBukkitItem();
+//                ItemMeta itemMeta = bukkitItem.getItemMeta();
+//                PersistentDataContainer persistentDataContainer = itemMeta.getPersistentDataContainer();
+//
+//                // 创建一个 NamespacedKey
+//                NamespacedKey key = new NamespacedKey("rpostbox", "packagedisplay");
+//
+//                // 设置值
+//                persistentDataContainer.set(key, PersistentDataType.STRING, packagex.getId().toString());
+//                // 重新应用 ItemMeta
+//                bukkitItem.setItemMeta(itemMeta);
+//                return ClickableItem.of(bukkitItem, this::handler);
+//
+//            });
+//        }
+//        player.sendMessage(ChatColor.GREEN+"打开菜单    剩余邮件数量为"+list.size());
+//        Template template = TemplateManager.getTemplateManager().TemplateList.get("example");
+//        Component defaultComponentByString = template.getDefaultComponentByString();
+////        contents.g
+//        final String jsonText = GsonComponentSerializer.gson().serialize(defaultComponentByString);
+//        contents.setTitle(jsonText);
+//        contents.set(27, MailPageItem.previous(pagination,itemStackPrevious,false)); // Create previous page item with the itemstack provided in DefaultItemProvider
+//        contents.set(35, PageItem.next(pagination,itemStackNext,false)); // Create next page item with the itemstack provided in DefaultItemProvider
+//
+//    }
+
+
     @Override
     public void onLoad(@NotNull Player player, @NotNull MenuContents contents) {
 
@@ -108,19 +198,38 @@ public final class PaginationExampleMenu implements PlayerMenuProvider {
                 .asyncPageSwitching(false) // Optionally, default is false
                 .iterator(iterator)
                 .create();
-        for (ItemStack item:list) {
-            pagination.addItem(() -> ClickableItem.of(item, this::handler));
+        PostBox playerPostBox = Cache.postBoxes.get(player.getName());
+        if (playerPostBox== null){
+            playerPostBox = RookiePostBox.getInstance().getMongoDBManager().getPostBoxByPlayer(player);
+//            Cache.postBoxes.put(player.getName(),playerPostBox);
         }
-        player.sendMessage(ChatColor.GREEN+"打开菜单    剩余邮件数量为"+list.size());
+        List<Package> packages = playerPostBox.getPackages();
+
+        for (Package packagex:packages) {
+            pagination.addItem(() -> {
+                ItemStack bukkitItem = packagex.getItemContent().get(0).getBukkitItem();
+                ItemMeta itemMeta = bukkitItem.getItemMeta();
+                PersistentDataContainer persistentDataContainer = itemMeta.getPersistentDataContainer();
+
+                // 创建一个 NamespacedKey
+                NamespacedKey key = new NamespacedKey("rpostbox", "packagedisplay");
+                itemMeta.setDisplayName(packagex.getMessage());
+                // 设置值
+                persistentDataContainer.set(key, PersistentDataType.STRING, packagex.getId().toString());
+                // 重新应用 ItemMeta
+                bukkitItem.setItemMeta(itemMeta);
+                return ClickableItem.of(bukkitItem, this::handler);
+
+            });
+        }
+//        player.sendMessage(ChatColor.GREEN+"打开菜单 剩余邮件数量为"+list.size());
         Template template = TemplateManager.getTemplateManager().TemplateList.get("example");
         Component defaultComponentByString = template.getDefaultComponentByString();
-//        contents.g
         final String jsonText = GsonComponentSerializer.gson().serialize(defaultComponentByString);
         contents.setTitle(jsonText);
         contents.set(27, MailPageItem.previous(pagination,itemStackPrevious,false)); // Create previous page item with the itemstack provided in DefaultItemProvider
         contents.set(35, PageItem.next(pagination,itemStackNext,false)); // Create next page item with the itemstack provided in DefaultItemProvider
 
     }
-
 
 }

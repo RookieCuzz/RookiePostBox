@@ -3,17 +3,19 @@ package com.cuzz.rookiepostbox;
 import com.cuzz.rookiepostbox.menu.anvil_input_menu.AnvilInputMenu;
 import com.cuzz.rookiepostbox.menu.pagination.PaginationExampleMenu;
 import com.cuzz.rookiepostbox.model.Package;
-import com.cuzz.rookiepostbox.model.PostBox;
 import com.cuzz.rookiepostbox.database.MongoDBManager;
 //import com.github.retrooper.packetevents.PacketEvents;
 //import com.github.retrooper.packetevents.event.PacketListenerPriority;
 //import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
-import com.cuzz.rookiepostbox.test.PacketEventsPacketListener;
+import com.cuzz.rookiepostbox.model.item.AdminItem;
+import com.cuzz.rookiepostbox.nms.Toast;
 import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.event.PacketListenerPriority;
+import dev.wuason.toastapi.SimpleToast;
+import dev.wuason.toastapi.nms.EToastType;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import nl.odalitadevelopments.menus.OdalitaMenus;
-import org.bson.types.ObjectId;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -21,15 +23,11 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityShootBowEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Date;
-import java.util.HashMap;
 
 public final class RookiePostBox extends JavaPlugin implements Listener {
 
@@ -42,13 +40,21 @@ public final class RookiePostBox extends JavaPlugin implements Listener {
         return odalitaMenus;
     }
 
-    MongoDBManager mongoDBManager = new MongoDBManager();
+    private MongoDBManager mongoDBManager;
+
+    public MongoDBManager getMongoDBManager(){
+
+        return this.mongoDBManager;
+    }
+
     @Override
     public void onEnable() {
         // Plugin startup logic
         odalitaMenus = OdalitaMenus.createInstance(this);
         this.getCommand("RookiePostBox").setExecutor(new TestCommandExecutor());
         Bukkit.getPluginManager().registerEvents(this, this);
+        mongoDBManager=new MongoDBManager();
+        mongoDBManager.connect("mongodb://103.205.253.165:27017","RookiePostBox");
         this.instance=this;
         setupPacket();
     }
@@ -137,17 +143,31 @@ public final class RookiePostBox extends JavaPlugin implements Listener {
                 }
                 if (args[0].equalsIgnoreCase("save")){
 
-
-                    Package.PackageBuilder time = Package.builder().ownerUUID(String.valueOf(player.getUniqueId()))
+                    Package aPackage = Package.builder().ownerUUID(String.valueOf(player.getUniqueId()))
                             .senderName(player.getName())
                             .message(args[1])
-                            .createTime(new Date());
+                            .createTime(new Date()).build();
                     ItemStack item = player.getInventory().getItemInMainHand();
+                    AdminItem adminItem = new AdminItem();
+                    adminItem.setAmount(item.getAmount());
+                    adminItem.setStoreID("测试商品");
+                    adminItem.setBukkitItem(item);
+                    adminItem.setItemDisplayName(item.getItemMeta().getDisplayName());
+                    String string = adminItem.serializeItemStackToBase64(item);
+                    adminItem.setBase64Item(string);
+                    aPackage.addItem(adminItem);
+                    boolean t = mongoDBManager.addPackageToPostBox(aPackage, player, true);
+                    System.out.println(t?"保存成功":"保存失败");
 
 
+                    String text = GsonComponentSerializer.gson().serialize(
+                            Component.text("保存成功22222222")
+                    );
 
-
+//                    SimpleToast.sendToast(item, player,args[1] , EToastType.GOAL);
+                    Toast.displayTo(player,item.getType().toString().toLowerCase(),args[1], Toast.Style.TASK);
                 }
+
 
                 return true;
             }

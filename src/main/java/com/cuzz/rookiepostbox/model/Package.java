@@ -22,7 +22,7 @@ import java.util.stream.Stream;
 
 @Builder
 @Data
-@Entity(value = "packages",discriminator="package")
+@Entity(value = "somePackage",discriminator="normalPackage")
 @NoArgsConstructor  // 生成无参构造函数
 @AllArgsConstructor // 生成全参构造函数
 public class Package {

@@ -6,6 +6,7 @@ load: STARTUP
 depends:
   - OdalitaMenus
   - RookieFonts
+  - UltimateAdvancementAPI
 commands:
   RookiePostBox:
     permission: RookiePostBox.*

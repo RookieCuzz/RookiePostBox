@@ -23,11 +23,11 @@ public interface Dao {
 
     // 从玩家邮箱中删除某个包裹
     boolean deletePackageFromPostBox(Package packageX,PostBox postBox);
-
-
+    public boolean addPackageToPostBox(Package packageX, Player player, boolean isOnline);
+    public boolean deletePackageFromPostBox(String packageId, PostBox postBox);
     boolean deletePackageFromPostBox(Package packageX,String uuid);
 
     Package savePackageToDB(Package packageX);
 
-
+    public PostBox savePostBoxToDB(PostBox postBox);
 }

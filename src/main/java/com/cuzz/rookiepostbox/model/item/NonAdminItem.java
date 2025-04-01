@@ -6,11 +6,13 @@ import lombok.NoArgsConstructor;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
-@Entity(discriminator = "nonAdminItem")
+@Entity(value="abstractItems",discriminator = "nonAdminItem")
 @NoArgsConstructor
 public class NonAdminItem extends AbstractItem{
 
     public NonAdminItem(ItemStack itemStack, @Nullable String itemDisplayName) {
         super(itemStack, itemDisplayName);
     }
+
+
 }

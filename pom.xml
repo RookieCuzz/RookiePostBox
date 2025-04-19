@@ -13,7 +13,7 @@
 
     <properties>
         <java.version>17</java.version>
-        <remapped.version>1.21.1-R0.1-SNAPSHOT</remapped.version>
+        <remapped.version>1.21.4-R0.1-SNAPSHOT</remapped.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -129,7 +129,7 @@
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.21-R0.1-SNAPSHOT</version>
+            <version>1.21.4-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -144,14 +144,12 @@
             <artifactId>RookieFont</artifactId>
             <version>1.0</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/libs/RookieFonts-1.0-SNAPSHOT-all.jar</systemPath>
+            <systemPath>${pom.basedir}/libs/RookieFonts-1.0-SNAPSHOT-all.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>io.github.odalita-developments.odalitamenus</groupId>
             <artifactId>core</artifactId>
-            <version>0.5.13</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/libs/core-0.5.13.jar</systemPath>
+            <version>0.6.2</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains</groupId>

@@ -1,8 +1,6 @@
 package com.cuzz.rookiepostbox.menu.pagination;
 
 
-import com.cuzz.rookiepostbox.RookiePostBox;
-import nl.odalitadevelopments.menus.menu.MenuSession;
 import nl.odalitadevelopments.menus.pagination.Pagination;
 import org.bukkit.entity.Player;
 
@@ -13,7 +11,7 @@ public class PageVariable implements BiFunction<String, Player, String> {
     @Override
     public String apply(String string, Player player) {
 
-        Pagination pagination = PaginationExampleMenu.cacheMenu.get(player);
+        Pagination pagination = PostBoxMenu.cacheMenu.get(player);
         int i = pagination.currentPage();
 
         String replace = string.replace("{currentPage}", String.valueOf(i));

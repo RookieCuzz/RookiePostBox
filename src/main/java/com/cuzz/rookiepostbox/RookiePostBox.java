@@ -1,7 +1,7 @@
 package com.cuzz.rookiepostbox;
 
 import com.cuzz.rookiepostbox.menu.anvil_input_menu.AnvilInputMenu;
-import com.cuzz.rookiepostbox.menu.pagination.PaginationExampleMenu;
+import com.cuzz.rookiepostbox.menu.pagination.PostBoxMenu;
 import com.cuzz.rookiepostbox.model.Package;
 import com.cuzz.rookiepostbox.database.MongoDBManager;
 //import com.github.retrooper.packetevents.PacketEvents;
@@ -10,11 +10,7 @@ import com.cuzz.rookiepostbox.database.MongoDBManager;
 import com.cuzz.rookiepostbox.model.item.AdminItem;
 import com.cuzz.rookiepostbox.nms.Toast;
 import com.github.retrooper.packetevents.PacketEvents;
-import dev.wuason.toastapi.SimpleToast;
-import dev.wuason.toastapi.nms.EToastType;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import nl.odalitadevelopments.menus.OdalitaMenus;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -26,6 +22,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Date;
 
@@ -53,9 +50,9 @@ public final class RookiePostBox extends JavaPlugin implements Listener {
         odalitaMenus = OdalitaMenus.createInstance(this);
         this.getCommand("RookiePostBox").setExecutor(new TestCommandExecutor());
         Bukkit.getPluginManager().registerEvents(this, this);
-        mongoDBManager=new MongoDBManager();
+        mongoDBManager = new MongoDBManager();
         mongoDBManager.connect("mongodb://103.205.253.165:27017","RookiePostBox");
-        this.instance=this;
+        instance = this;
         setupPacket();
     }
     public  void setupPacket(){
@@ -121,51 +118,50 @@ public final class RookiePostBox extends JavaPlugin implements Listener {
 //
 //
 //    }
-    // 定义 /test 命令的处理逻辑
+
     public class TestCommandExecutor implements CommandExecutor {
 //    EntityShootBowEvent
         @Override
-        public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-            if (sender instanceof Player) {
-                Player player = (Player) sender;
-                // 当玩家输入 /test 时发送消息 666
+        public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
+            if (sender instanceof Player player) {
                 if (args[0].equalsIgnoreCase("menu")){
-                    odalitaMenus.openMenu(new PaginationExampleMenu(), player);
-                }
-                if (args[0].equalsIgnoreCase("write")){
+                    odalitaMenus.openMenu(new PostBoxMenu(), player);
+                } else if (args[0].equalsIgnoreCase("write")){
                     odalitaMenus.openMenu(new AnvilInputMenu((input) -> {
                         player.sendMessage("You entered: " + input);
                     }), player);
-                }
-                if (args.length<2){
-                    System.out.println("请输入/test save 消息内容");
-                    return false;
-                }
-                if (args[0].equalsIgnoreCase("save")){
-
-                    Package aPackage = Package.builder().ownerUUID(String.valueOf(player.getUniqueId()))
+                } else if (args[0].equalsIgnoreCase("save")){
+                    if (args.length != 2) {
+                        System.out.println("请输入/rookiepostbox save 消息内容");
+                        return false;
+                    }
+                    Package aPackage = Package.builder().ownerUUID(player.getUniqueId().toString())
                             .senderName(player.getName())
                             .message(args[1])
                             .createTime(new Date()).build();
                     ItemStack item = player.getInventory().getItemInMainHand();
+                    if(item.getType().isAir()){
+                        player.sendMessage("请先选择一个物品");
+                        return false;
+                    }
                     AdminItem adminItem = new AdminItem();
                     adminItem.setAmount(item.getAmount());
                     adminItem.setStoreID("测试商品");
                     adminItem.setBukkitItem(item);
-                    adminItem.setItemDisplayName(item.getItemMeta().getDisplayName());
+                    adminItem.setItemDisplayName(item.getItemMeta().hasDisplayName() ? item.getItemMeta().getDisplayName() : item.getType().name());
                     String string = adminItem.serializeItemStackToBase64(item);
                     adminItem.setBase64Item(string);
                     aPackage.addItem(adminItem);
                     boolean t = mongoDBManager.addPackageToPostBox(aPackage, player, true);
-                    System.out.println(t?"保存成功":"保存失败");
+                    System.out.println(t ? "保存成功" : "保存失败");
 
 
-                    String text = GsonComponentSerializer.gson().serialize(
-                            Component.text("保存成功22222222")
-                    );
+//                    String text = GsonComponentSerializer.gson().serialize(
+//                            Component.text("保存成功22222222")
+//                    );
 
 //                    SimpleToast.sendToast(item, player,args[1] , EToastType.GOAL);
-                    Toast.displayTo(player,item.getType().toString().toLowerCase(),args[1], Toast.Style.TASK);
+                    Toast.displayTo(player,item.getType().toString().toLowerCase(),"已发送：" + args[1], Toast.Style.TASK);
                 }
 
 

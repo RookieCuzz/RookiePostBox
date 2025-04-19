@@ -82,12 +82,11 @@ public class MongoDBManager implements Dao {
             UpdateOperator pullOperator = UpdateOperators.addToSet("packages",dbRef);
             String uuid = player.getUniqueId().toString();
             PostBox postBoxByUUID = getPostBoxByUUID(uuid);
-            if (postBoxByUUID==null){
+            if (postBoxByUUID == null){
                 createNewPostBox(uuid,"测试用户");
             }
-            if (Cache.postBoxes.get(player.getName())!=null){
+            if (Cache.postBoxes.get(player.getName()) != null){
                 Cache.postBoxes.remove(player.getName());
-
             }
             this.datastore.find(PostBox.class).filter(Filters.eq("_id",uuid)).update(pullOperator).execute();
             return true;
@@ -188,7 +187,6 @@ public class MongoDBManager implements Dao {
     @Override
     public PostBox getPostBoxByPlayer(Player player) {
         return this.getPostBoxByUUID(player.getUniqueId().toString());
-
     }
     @Override
     public boolean deletePackageFromPostBox(Package packageX, PostBox postBox) {

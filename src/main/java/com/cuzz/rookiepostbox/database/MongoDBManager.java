@@ -33,12 +33,14 @@ public class MongoDBManager implements Dao {
         try {
             // 创建 MongoDB 客户端
             mongoClient = MongoClients.create(connectionString);
-//            ManualMorphiaConfig configure = ManualMorphiaConfig.configure();
+            //            ManualMorphiaConfig configure = ManualMorphiaConfig.configure();
 //            List<String> list = Arrays.asList("com.cuzz.rookiepostbox");
 ////            ManualMorphiaConfig packages = (ManualMorphiaConfig)configure.packages(list).database("test")
 ////                    .applyIndexes(true).autoImportModels(true)
 ////                    .applyDocumentValidations(true);
 //            // 创建 Datastore，Morphia 会自动扫描并映射所有实体类
+
+
             datastore = Morphia.createDatastore(mongoClient,dbName);
             datastore.getMapper().map(AdminItem.class);
             datastore.getMapper().map(PostBox.class);

@@ -27,17 +27,17 @@ public class PackageAPI {
         String string = adminItem.serializeItemStackToBase64(item);
         adminItem.setBase64Item(string);
         aPackage.addItem(adminItem);
-        boolean t = RookiePostBox.getInstance().getMongoDBManager().addPackageToPostBox(aPackage, receiver, true);
+        boolean t = RookiePostBox.getInstance().getMongoDbManager().addPackageToPostBox(aPackage, receiver, true);
     }
 
     public void deletePackage(@NotNull Player player, @NotNull String packageID){
-        PostBox postBox = RookiePostBox.getInstance().getMongoDBManager().getPostBoxByPlayer(player);
-        boolean t = RookiePostBox.getInstance().getMongoDBManager().deletePackageFromPostBox(packageID, postBox);
+        PostBox postBox = RookiePostBox.getInstance().getMongoDbManager().getPostBoxByPlayer(player);
+        boolean t = RookiePostBox.getInstance().getMongoDbManager().deletePackageFromPostBox(packageID, postBox);
     }
 
     public List<String> getPackageIdsByPlayer(@NotNull Player player){
         List<String> packages = new ArrayList<>();
-        PostBox postBox = RookiePostBox.getInstance().getMongoDBManager().getPostBoxByPlayer(player);
+        PostBox postBox = RookiePostBox.getInstance().getMongoDbManager().getPostBoxByPlayer(player);
         if (postBox != null){
             postBox.getPackages().forEach(packagex -> packages.add(packagex.getId().toString()));
         }

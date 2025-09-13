@@ -6,7 +6,7 @@
 
     <groupId>com.cuzz</groupId>
     <artifactId>RookiePostBox</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>RookiePostBox</name>
@@ -117,15 +117,16 @@
             <id>jitpack.io</id>
             <url>https://jitpack.io</url>
         </repository>
+
+        <repository>
+            <id>maven-public</id>
+            <url>https://www.4399mc.cn/nexus/repository/maven-public/</url>
+        </repository>
+
+
     </repositories>
 
     <dependencies>
-        <dependency>
-            <groupId>com.github.Wuason6x9</groupId>
-            <artifactId>SimpleToastApi</artifactId>
-            <version>0.3</version>
-            <scope>compile</scope>
-        </dependency>
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
@@ -140,16 +141,16 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.cuzz</groupId>
-            <artifactId>RookieFont</artifactId>
-            <version>1.0</version>
-            <scope>system</scope>
-            <systemPath>${pom.basedir}/libs/RookieFonts-1.0-SNAPSHOT-all.jar</systemPath>
+            <groupId>me.trytofeel</groupId>
+            <artifactId>RookieFonts</artifactId>
+            <version>1.1.0</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>io.github.odalita-developments.odalitamenus</groupId>
             <artifactId>core</artifactId>
             <version>0.6.2</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.jetbrains</groupId>
@@ -167,12 +168,6 @@
             <groupId>dev.morphia.morphia</groupId>
             <artifactId>morphia-core</artifactId>
             <version>2.2.1</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.retrooper</groupId>
-            <artifactId>packetevents-spigot</artifactId>
-            <version>2.7.0</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>

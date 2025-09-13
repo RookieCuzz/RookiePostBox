@@ -2,11 +2,9 @@ name: RookiePostBox
 version: '${project.version}'
 main: com.cuzz.rookiepostbox.RookiePostBox
 api-version: '1.20'
-load: STARTUP
 depends:
   - OdalitaMenus
   - RookieFonts
-  - UltimateAdvancementAPI
 commands:
   RookiePostBox:
     permission: RookiePostBox.*

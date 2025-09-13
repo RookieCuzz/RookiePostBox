@@ -5,9 +5,9 @@ import com.cuzz.rookiepostbox.menu.common.ItemBuilder;
 import com.cuzz.rookiepostbox.model.Package;
 import com.cuzz.rookiepostbox.model.PostBox;
 import com.cuzz.rookiepostbox.model.item.AbstractItem;
-import me.trytofeel.rookieFonts.RookieFonts;
-import me.trytofeel.rookieFonts.manager.TemplateManager;
-import me.trytofeel.rookieFonts.models.Template;
+import me.trytofeel.rookiefonts.RookieFonts;
+import me.trytofeel.rookiefonts.entity.Template;
+import me.trytofeel.rookiefonts.manager.TemplateManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import nl.odalitadevelopments.menus.annotations.Menu;
@@ -27,13 +27,9 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
-import org.bukkit.util.io.BukkitObjectInputStream;
 import org.jetbrains.annotations.NotNull;
 import org.bukkit.NamespacedKey;
 import org.bukkit.persistence.PersistentDataType;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -91,7 +87,7 @@ public final class PostBoxMenu implements PlayerMenuProvider {
                     // 设置值
                     PostBox playerPostBox = Cache.postBoxes.get(player.getName());
                     if (playerPostBox == null){
-                        playerPostBox = RookiePostBox.getInstance().getMongoDBManager().getPostBoxByPlayer(player);
+                        playerPostBox = RookiePostBox.getInstance().getMongoDbManager().getPostBoxByPlayer(player);
                     }
                     String packageId = persistentDataContainer.get(key, PersistentDataType.STRING);
                     playerPostBox.getPackages().forEach(packagex -> {
@@ -107,11 +103,15 @@ public final class PostBoxMenu implements PlayerMenuProvider {
                             });
                         }
                     });
-                    if(!success.get()) return;
-                    RookiePostBox.getInstance().getMongoDBManager().deletePackageFromPostBox(packageId, playerPostBox);
+                    if(!success.get()) {
+                        return;
+                    }
+                    RookiePostBox.getInstance().getMongoDbManager().deletePackageFromPostBox(packageId, playerPostBox);
                 }
         );
-        if(!success.get()) return;
+        if(!success.get()) {
+            return;
+        }
         int startSlot = pagination.iterator().getStartSlotPos().getSlot();
         ItemStack item = event.getClickedInventory().getItem(startSlot + 2);
         boolean lastOne = false;
@@ -132,18 +132,21 @@ public final class PostBoxMenu implements PlayerMenuProvider {
         RookiePostBox.getInstance().getOdalitaMenus().openMenuBuilder(new PostBoxMenu(), (Player) player)
                 .pagination("mail_pagination", currentPageX) // Use same id as provided in the menu
                 .open();
-
-        Map<String, String> stringStringMap = RookieFonts.playerPapiMap.get(player.getName());
+        Map<String, Map<String, String>> playerPlaceholderHashMap = RookieFonts.getInstance().getPlayerPlaceholderHashMap();
+        Map<String, String> stringStringMap = playerPlaceholderHashMap.get(player.getName());
         if(stringStringMap == null){
             stringStringMap = new HashMap<>();
         }
         stringStringMap.put("%currentPage%",String.valueOf(currentPageX + 1));
         stringStringMap.put("%pageAmount%",String.valueOf(pagination.lastPage() + 1));
-        RookieFonts.playerPapiMap.put(player.getName(),stringStringMap);
-        Template template = TemplateManager.getTemplateManager().TemplateList.get("mail");
-        Component defaultComponentByString = template.getDefaultComponentByString(player.getName());
+        playerPlaceholderHashMap.put(player.getName(),stringStringMap);
+
+        Template maiTemplate = RookieFonts.getInstance().getTemplateManager().getTemplateHashMap().get("mail");
+        Component defaultComponentByString = maiTemplate.getDefaultComponent(player.getName());
         String jsonText = GsonComponentSerializer.gson().serialize(defaultComponentByString);
-        openMenuSession.getMenuContents().setTitle(jsonText);
+        if (openMenuSession != null) {
+            openMenuSession.getMenuContents().setTitle(jsonText);
+        }
     }
 
     @Override
@@ -156,11 +159,11 @@ public final class PostBoxMenu implements PlayerMenuProvider {
                 .create();
         PostBox playerPostBox = Cache.postBoxes.get(player.getName());
         if(playerPostBox == null) {
-            playerPostBox = RookiePostBox.getInstance().getMongoDBManager().getPostBoxByPlayer(player);
+            playerPostBox = RookiePostBox.getInstance().getMongoDbManager().getPostBoxByPlayer(player);
         }
         if(playerPostBox == null) {
-            RookiePostBox.getInstance().getMongoDBManager().createNewPostBox(player.getUniqueId().toString(),player.getName());
-            playerPostBox = RookiePostBox.getInstance().getMongoDBManager().getPostBoxByPlayer(player);
+            RookiePostBox.getInstance().getMongoDbManager().createNewPostBox(player.getUniqueId().toString(),player.getName());
+            playerPostBox = RookiePostBox.getInstance().getMongoDbManager().getPostBoxByPlayer(player);
         }
         List<Package> packages = playerPostBox.getPackages();
 
@@ -192,17 +195,17 @@ public final class PostBoxMenu implements PlayerMenuProvider {
                 return ClickableItem.of(bukkitItem, this::handler);
             });
         }
-
-        Map<String, String> stringStringMap = RookieFonts.playerPapiMap.get(player.getName());
+        Map<String, Map<String, String>> playerPlaceholderHashMap = RookieFonts.getInstance().getPlayerPlaceholderHashMap();
+        Map<String, String> stringStringMap =playerPlaceholderHashMap.get(player.getName());
         if(stringStringMap == null){
             stringStringMap = new HashMap<>();
         }
         stringStringMap.put("%currentPage%",String.valueOf(currentPageX + 1));
         stringStringMap.put("%pageAmount%",String.valueOf(pagination.lastPage() + 1));
-        RookieFonts.playerPapiMap.put(player.getName(),stringStringMap);
-
-        Template template = TemplateManager.getTemplateManager().TemplateList.get("mail");
-        Component defaultComponentByString = template.getDefaultComponentByString(player.getName());
+        playerPlaceholderHashMap.put(player.getName(),stringStringMap);
+        TemplateManager templateManager = RookieFonts.getInstance().getTemplateManager();
+        Template template = templateManager.getTemplateHashMap().get("mail");
+        Component defaultComponentByString = template.getDefaultComponent(player.getName());
         String jsonText = GsonComponentSerializer.gson().serialize(defaultComponentByString);
 
         contents.setTitle(jsonText);
@@ -212,16 +215,16 @@ public final class PostBoxMenu implements PlayerMenuProvider {
         contents.events().onInventoryEvent(InventoryClickEvent.class, inventoryClickEvent -> {
 
             Bukkit.getScheduler().runTaskLater(RookiePostBox.getInstance(), () -> {
-                Map<String, String> ssM = RookieFonts.playerPapiMap.get(player.getName());
+                Map<String, String> ssM = playerPlaceholderHashMap.get(player.getName());
                 if(ssM == null){
                     ssM = new HashMap<>();
                 }
                 ssM.put("%currentPage%",String.valueOf(pagination.currentPage() + 1));
                 ssM.put("%pageAmount%",String.valueOf(pagination.lastPage() + 1));
-                RookieFonts.playerPapiMap.put(player.getName(),ssM);
+                playerPlaceholderHashMap.put(player.getName(),ssM);
 
-                Template t = TemplateManager.getTemplateManager().TemplateList.get("mail");
-                Component dC = t.getDefaultComponentByString(player.getName());
+                Template t = templateManager.getTemplateHashMap().get("mail");
+                Component dC = t.getDefaultComponent(player.getName());
                 String j = GsonComponentSerializer.gson().serialize(dC);
 
                 contents.setTitle(j);

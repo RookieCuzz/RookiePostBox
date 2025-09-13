@@ -1,9 +1,6 @@
 package com.cuzz.rookiepostbox.menu.pagination;
 
-import me.trytofeel.rookieFonts.manager.TemplateManager;
-import me.trytofeel.rookieFonts.models.Block;
-import me.trytofeel.rookieFonts.models.Line;
-import me.trytofeel.rookieFonts.models.Template;
+
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import nl.odalitadevelopments.menus.OdalitaMenus;
@@ -93,7 +90,9 @@ public class MailPageItem extends PageUpdatableItem {
     @Override
     public @NotNull Consumer<InventoryClickEvent> onClick(@NotNull OdalitaMenus instance, @NotNull MenuContents contents) {
         return (event) -> {
-            if (!(event.getWhoClicked() instanceof Player player)) return;
+            if (!(event.getWhoClicked() instanceof Player player)) {
+                return;
+            }
 
 
             Cooldown cooldown = instance.getProvidersContainer().getCooldownProvider().pageCooldown();

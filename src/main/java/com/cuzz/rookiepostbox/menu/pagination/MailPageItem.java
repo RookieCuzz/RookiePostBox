@@ -17,11 +17,16 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
 public class MailPageItem extends PageUpdatableItem {
     public static @NotNull MailPageItem previous(@NotNull IPagination<?, ?> pagination, @NotNull ItemStack itemStack, boolean showOnFirstPage) {
         return new MailPageItem(MailPageItem.Type.PREVIOUS, pagination, itemStack, showOnFirstPage);
+    }
+
+    public static @NotNull MailPageItem previous(@NotNull IPagination<?, ?> pagination, @NotNull BiFunction<Integer, Integer, ItemStack> itemStackProvider, boolean showOnFirstPage) {
+        return new MailPageItem(MailPageItem.Type.PREVIOUS, pagination, itemStackProvider, showOnFirstPage);
     }
 
     public static @NotNull MailPageItem previous(@NotNull IPagination<?, ?> pagination, boolean showOnFirstPage) {
@@ -38,6 +43,10 @@ public class MailPageItem extends PageUpdatableItem {
 
     public static @NotNull MailPageItem next(@NotNull IPagination<?, ?> pagination, @NotNull ItemStack itemStack, boolean showOnLastPage) {
         return new MailPageItem(MailPageItem.Type.NEXT, pagination, itemStack, showOnLastPage);
+    }
+
+    public static @NotNull MailPageItem next(@NotNull IPagination<?, ?> pagination, @NotNull BiFunction<Integer, Integer, ItemStack> itemStackProvider, boolean showOnLastPage) {
+        return new MailPageItem(MailPageItem.Type.NEXT, pagination, itemStackProvider, showOnLastPage);
     }
 
     public static @NotNull MailPageItem next(@NotNull IPagination<?, ?> pagination, boolean showOnLastPage) {
@@ -57,23 +66,37 @@ public class MailPageItem extends PageUpdatableItem {
     private final boolean showOnFirstOrLastPage;
 
     private final ItemStack itemStack;
+    private final BiFunction<Integer, Integer, ItemStack> itemStackProvider;
 
     private MailPageItem(MailPageItem.Type type, IPagination<?, ?> pagination, ItemStack itemStack, boolean showOnFirstOrLastPage) {
         this.type = type;
         this.pagination = pagination;
         this.itemStack = itemStack;
+        this.itemStackProvider = null;
+        this.showOnFirstOrLastPage = showOnFirstOrLastPage;
+    }
+
+    private MailPageItem(MailPageItem.Type type, IPagination<?, ?> pagination, BiFunction<Integer, Integer, ItemStack> itemStackProvider, boolean showOnFirstOrLastPage) {
+        this.type = type;
+        this.pagination = pagination;
+        this.itemStack = null;
+        this.itemStackProvider = itemStackProvider;
         this.showOnFirstOrLastPage = showOnFirstOrLastPage;
     }
 
     private MailPageItem(MailPageItem.Type type, IPagination<?, ?> pagination, boolean showOnFirstOrLastPage) {
 
-        this(type, pagination, null, showOnFirstOrLastPage);
+        this(type, pagination, (ItemStack) null, showOnFirstOrLastPage);
     }
 
     @Override
     protected @NotNull ItemStack getItemStack(@NotNull OdalitaMenus instance, @NotNull MenuContents contents) {
         if (!this.showOnFirstOrLastPage && !this.canBeUsed()) {
             return new ItemStack(Material.AIR);
+        }
+
+        if (this.itemStackProvider != null) {
+            return this.itemStackProvider.apply(this.pagination.currentPage() + 1, this.pagination.lastPage() + 1);
         }
 
         if (this.itemStack == null) {

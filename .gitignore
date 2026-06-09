@@ -96,6 +96,7 @@ $RECYCLE.BIN/
 *.lnk
 
 target/
+node_modules/
 
 pom.xml.tag
 pom.xml.releaseBackup
@@ -112,3 +113,4 @@ buildNumber.properties
 # Common working directory
 run/
 test-server/
+docs/**/craft-engine/

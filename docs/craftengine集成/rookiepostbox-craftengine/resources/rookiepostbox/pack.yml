@@ -1,0 +1,5 @@
+author: RookiePostBox
+version: 1.0.0
+description: RookiePostBox GUI assets for CraftEngine
+namespace: rookiepostbox
+enable: true

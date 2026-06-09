@@ -1,0 +1,51 @@
+items#gui_buttons:
+  rookiepostbox:mailbox_previous:
+    material: brick
+    custom-model-data: 21001
+    data:
+      item-name: "<!i><yellow>Previous Page</yellow>"
+    model:
+      type: minecraft:model
+      path: minecraft:item/custom/rookiepostbox/mailbox_previous
+      generation:
+        parent: minecraft:item/generated
+        textures:
+          layer0: minecraft:item/custom/rookiepostbox/mailbox_previous
+  rookiepostbox:mailbox_next:
+    material: brick
+    custom-model-data: 21002
+    data:
+      item-name: "<!i><yellow>Next Page</yellow>"
+    model:
+      type: minecraft:model
+      path: minecraft:item/custom/rookiepostbox/mailbox_next
+      generation:
+        parent: minecraft:item/generated
+        textures:
+          layer0: minecraft:item/custom/rookiepostbox/mailbox_next
+
+items#mail_icons:
+  rookiepostbox:unopened_box:
+    material: bundle
+    custom-model-data: 21003
+    data:
+      item-name: "<!i><gold>New Mail</gold>"
+    model:
+      type: minecraft:model
+      path: minecraft:item/custom/rookiepostbox/unopened_box
+      generation:
+        parent: minecraft:item/generated
+        textures:
+          layer0: minecraft:item/custom/rookiepostbox/unopened_box
+  rookiepostbox:ready_box:
+    material: bundle
+    custom-model-data: 21004
+    data:
+      item-name: "<!i><green>Ready Mail</green>"
+    model:
+      type: minecraft:model
+      path: minecraft:item/custom/rookiepostbox/ready_box
+      generation:
+        parent: minecraft:item/generated
+        textures:
+          layer0: minecraft:item/custom/rookiepostbox/ready_box

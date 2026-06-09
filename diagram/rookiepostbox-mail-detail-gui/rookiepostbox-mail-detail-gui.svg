@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 560">
+  <defs>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1e293b" stroke-width="0.5"/>
+    </pattern>
+    <marker id="arrow-cyan" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#22d3ee"/>
+    </marker>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&amp;display=swap');
+      text { font-family: 'JetBrains Mono', 'Noto Sans SC', 'PingFang SC', sans-serif; }
+      .title { fill: #f8fafc; font-size: 18px; font-weight: 700; }
+      .subtitle { fill: #94a3b8; font-size: 11px; }
+      .label { fill: #e2e8f0; font-size: 12px; font-weight: 600; }
+      .small { fill: #cbd5e1; font-size: 10px; }
+      .tiny { fill: #94a3b8; font-size: 8px; }
+      .window { fill: #0f172a; stroke: #64748b; stroke-width: 1.5; }
+      .slot { fill: rgba(8, 51, 68, 0.45); stroke: #22d3ee; stroke-width: 1.4; }
+      .slot-empty { fill: rgba(30, 41, 59, 0.65); stroke: #475569; stroke-width: 1.2; }
+      .player { fill: rgba(6, 78, 59, 0.35); stroke: #34d399; stroke-width: 1.2; }
+      .blocked { fill: rgba(136, 19, 55, 0.35); stroke: #fb7185; stroke-width: 1.2; }
+      .note { fill: #fbbf24; font-size: 10px; }
+    </style>
+  </defs>
+
+  <rect width="100%" height="100%" fill="#0f172a"/>
+  <rect width="100%" height="100%" fill="url(#grid)"/>
+
+  <text x="32" y="46" class="title">RookiePostBox 邮件消息 GUI</text>
+  <text x="32" y="68" class="subtitle">普通左键打开邮件即标记领取；附件位于 0-8 槽，可拖入玩家背包；关闭时剩余附件自动回收到背包，溢出掉落在玩家身旁。</text>
+
+  <rect x="170" y="110" width="620" height="168" rx="8" class="window"/>
+  <text x="480" y="142" class="label" text-anchor="middle">Title: 邮件消息</text>
+
+  <g transform="translate(200,170)">
+    <rect x="0" y="0" width="52" height="52" rx="5" class="slot"/>
+    <rect x="60" y="0" width="52" height="52" rx="5" class="slot"/>
+    <rect x="120" y="0" width="52" height="52" rx="5" class="slot"/>
+    <rect x="180" y="0" width="52" height="52" rx="5" class="slot"/>
+    <rect x="240" y="0" width="52" height="52" rx="5" class="slot"/>
+    <rect x="300" y="0" width="52" height="52" rx="5" class="slot"/>
+    <rect x="360" y="0" width="52" height="52" rx="5" class="slot"/>
+    <rect x="420" y="0" width="52" height="52" rx="5" class="slot"/>
+    <rect x="480" y="0" width="52" height="52" rx="5" class="slot"/>
+    <text x="26" y="24" class="small" text-anchor="middle">0</text>
+    <text x="86" y="24" class="small" text-anchor="middle">1</text>
+    <text x="146" y="24" class="small" text-anchor="middle">2</text>
+    <text x="206" y="24" class="small" text-anchor="middle">3</text>
+    <text x="266" y="24" class="small" text-anchor="middle">4</text>
+    <text x="326" y="24" class="small" text-anchor="middle">5</text>
+    <text x="386" y="24" class="small" text-anchor="middle">6</text>
+    <text x="446" y="24" class="small" text-anchor="middle">7</text>
+    <text x="506" y="24" class="small" text-anchor="middle">8</text>
+    <text x="266" y="76" class="subtitle" text-anchor="middle">邮件附件槽：最多 9 个 ItemStack</text>
+  </g>
+
+  <rect x="170" y="330" width="620" height="150" rx="8" fill="#0f172a" stroke="#34d399" stroke-width="1.5"/>
+  <text x="480" y="358" class="label" text-anchor="middle">玩家背包区域</text>
+  <g transform="translate(205,382)">
+    <rect x="0" y="0" width="44" height="44" rx="4" class="player"/>
+    <rect x="52" y="0" width="44" height="44" rx="4" class="player"/>
+    <rect x="104" y="0" width="44" height="44" rx="4" class="player"/>
+    <rect x="156" y="0" width="44" height="44" rx="4" class="player"/>
+    <rect x="208" y="0" width="44" height="44" rx="4" class="player"/>
+    <rect x="260" y="0" width="44" height="44" rx="4" class="player"/>
+    <rect x="312" y="0" width="44" height="44" rx="4" class="player"/>
+    <rect x="364" y="0" width="44" height="44" rx="4" class="player"/>
+    <rect x="416" y="0" width="44" height="44" rx="4" class="player"/>
+    <rect x="468" y="0" width="44" height="44" rx="4" class="player"/>
+    <text x="22" y="25" class="tiny" text-anchor="middle">9</text>
+    <text x="74" y="25" class="tiny" text-anchor="middle">10</text>
+    <text x="126" y="25" class="tiny" text-anchor="middle">11</text>
+    <text x="178" y="25" class="tiny" text-anchor="middle">12</text>
+    <text x="230" y="25" class="tiny" text-anchor="middle">13</text>
+    <text x="282" y="25" class="tiny" text-anchor="middle">14</text>
+    <text x="334" y="25" class="tiny" text-anchor="middle">15</text>
+    <text x="386" y="25" class="tiny" text-anchor="middle">16</text>
+    <text x="438" y="25" class="tiny" text-anchor="middle">17</text>
+    <text x="490" y="25" class="tiny" text-anchor="middle">18</text>
+  </g>
+
+  <path d="M 430 250 C 420 286, 405 316, 358 374" fill="none" stroke="#22d3ee" stroke-width="2" marker-end="url(#arrow-cyan)"/>
+  <text x="350" y="304" class="small" fill="#22d3ee">拖拽 / 点击移动到背包</text>
+
+  <rect x="74" y="155" width="64" height="52" rx="5" class="blocked"/>
+  <text x="106" y="176" class="small" text-anchor="middle">禁止</text>
+  <text x="106" y="193" class="tiny" text-anchor="middle">放入玩家物品</text>
+  <path d="M 140 182 L 196 196" fill="none" stroke="#fb7185" stroke-width="2" stroke-dasharray="5,4"/>
+
+  <g transform="translate(615,500)">
+    <rect x="0" y="-18" width="24" height="18" rx="3" class="slot"/>
+    <text x="34" y="-5" class="small">附件槽</text>
+    <rect x="112" y="-18" width="24" height="18" rx="3" class="player"/>
+    <text x="146" y="-5" class="small">玩家背包</text>
+    <rect x="250" y="-18" width="24" height="18" rx="3" class="blocked"/>
+    <text x="284" y="-5" class="small">禁止写入附件槽</text>
+  </g>
+
+  <text x="32" y="520" class="note">关闭规则：遍历 GUI 剩余附件 -> PlayerInventory.addItem -> overflow 使用 World.dropItemNaturally(player.location)。</text>
+</svg>

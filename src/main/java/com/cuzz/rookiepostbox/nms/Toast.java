@@ -43,7 +43,7 @@ public final class Toast {
                 "            \"item\": \"minecraft:" + icon + "\"\n" +
                 "        },\n" +
                 "        \"title\": {\n" +
-                "            \"text\": \"" + message.replace("|", "\n") + "\"\n" +
+                "            \"text\": \"" + escapeJson(message.replace("|", "\n")) + "\"\n" +
                 "        },\n" +
                 "        \"description\": {\n" +
                 "            \"text\": \"\"\n" +
@@ -72,6 +72,15 @@ public final class Toast {
 
     public static void displayTo(Player player, String icon, String message, Style style) {
         new Toast(icon, message, style).start(player);
+    }
+
+    private static String escapeJson(String text) {
+        return text
+                .replace("\\", "\\\\")
+                .replace("\"", "\\\"")
+                .replace("\r", "\\r")
+                .replace("\n", "\\n")
+                .replace("\t", "\\t");
     }
 
     public static enum Style {

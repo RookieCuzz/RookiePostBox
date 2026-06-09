@@ -1,0 +1,131 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1040 720">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&amp;display=swap');
+    text { font-family: 'JetBrains Mono', 'Noto Sans SC', 'PingFang SC', sans-serif; }
+    .title { fill: #f8fafc; font-size: 18px; font-weight: 700; }
+    .subtitle { fill: #94a3b8; font-size: 10px; }
+    .label { fill: #f8fafc; font-size: 10px; font-weight: 600; }
+    .small { fill: #cbd5e1; font-size: 8px; }
+    .tiny { fill: #94a3b8; font-size: 7px; }
+    .mail { fill: rgba(8, 51, 68, 0.45); stroke: #22d3ee; }
+    .nav { fill: rgba(120, 53, 15, 0.35); stroke: #fbbf24; }
+    .empty { fill: rgba(30, 41, 59, 0.55); stroke: #64748b; }
+    .reserved { fill: rgba(136, 19, 55, 0.35); stroke: #fb7185; }
+    .frame { fill: rgba(15, 23, 42, 0.78); stroke: #334155; }
+  </style>
+  <defs>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1e293b" stroke-width="0.5"/>
+    </pattern>
+    <marker id="arrow-amber" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#fbbf24"/>
+    </marker>
+    <marker id="arrow-cyan" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#22d3ee"/>
+    </marker>
+  </defs>
+
+  <rect width="1040" height="720" fill="#0f172a"/>
+  <rect width="1040" height="720" fill="url(#grid)"/>
+
+  <text x="32" y="42" class="title">RookiePostBox 邮箱 GUI 布局</text>
+  <text x="32" y="62" class="subtitle">Mineflayer 实测：CHEST_6_ROW，page-size=21，分页按钮固定在 27 / 35。</text>
+
+  <g transform="translate(40, 100)">
+    <rect x="0" y="0" width="572" height="442" rx="10" class="frame"/>
+    <text x="18" y="28" class="label">第一页：21 个包裹槽 + 下一页</text>
+    <text x="18" y="45" class="subtitle">包裹槽：19-25、28-34、37-43</text>
+    <g transform="translate(18, 68)">
+      <rect x="0" y="0" width="56" height="46" rx="5" class="empty"/><text x="28" y="20" class="tiny" text-anchor="middle">0</text><text x="28" y="33" class="tiny" text-anchor="middle">空</text>
+      <rect x="60" y="0" width="56" height="46" rx="5" class="empty"/><text x="88" y="20" class="tiny" text-anchor="middle">1</text><text x="88" y="33" class="tiny" text-anchor="middle">空</text>
+      <rect x="120" y="0" width="56" height="46" rx="5" class="empty"/><text x="148" y="20" class="tiny" text-anchor="middle">2</text><text x="148" y="33" class="tiny" text-anchor="middle">空</text>
+      <rect x="180" y="0" width="56" height="46" rx="5" class="empty"/><text x="208" y="20" class="tiny" text-anchor="middle">3</text><text x="208" y="33" class="tiny" text-anchor="middle">空</text>
+      <rect x="240" y="0" width="56" height="46" rx="5" class="empty"/><text x="268" y="20" class="tiny" text-anchor="middle">4</text><text x="268" y="33" class="tiny" text-anchor="middle">空</text>
+      <rect x="300" y="0" width="56" height="46" rx="5" class="empty"/><text x="328" y="20" class="tiny" text-anchor="middle">5</text><text x="328" y="33" class="tiny" text-anchor="middle">空</text>
+      <rect x="360" y="0" width="56" height="46" rx="5" class="empty"/><text x="388" y="20" class="tiny" text-anchor="middle">6</text><text x="388" y="33" class="tiny" text-anchor="middle">空</text>
+      <rect x="420" y="0" width="56" height="46" rx="5" class="empty"/><text x="448" y="20" class="tiny" text-anchor="middle">7</text><text x="448" y="33" class="tiny" text-anchor="middle">空</text>
+      <rect x="480" y="0" width="56" height="46" rx="5" class="empty"/><text x="508" y="20" class="tiny" text-anchor="middle">8</text><text x="508" y="33" class="tiny" text-anchor="middle">空</text>
+
+      <rect x="0" y="50" width="56" height="46" rx="5" class="empty"/><text x="28" y="70" class="tiny" text-anchor="middle">9</text><text x="28" y="83" class="tiny" text-anchor="middle">空</text>
+      <rect x="60" y="50" width="56" height="46" rx="5" class="empty"/><text x="88" y="70" class="tiny" text-anchor="middle">10</text><text x="88" y="83" class="tiny" text-anchor="middle">空</text>
+      <rect x="120" y="50" width="56" height="46" rx="5" class="empty"/><text x="148" y="70" class="tiny" text-anchor="middle">11</text><text x="148" y="83" class="tiny" text-anchor="middle">空</text>
+      <rect x="180" y="50" width="56" height="46" rx="5" class="empty"/><text x="208" y="70" class="tiny" text-anchor="middle">12</text><text x="208" y="83" class="tiny" text-anchor="middle">空</text>
+      <rect x="240" y="50" width="56" height="46" rx="5" class="empty"/><text x="268" y="70" class="tiny" text-anchor="middle">13</text><text x="268" y="83" class="tiny" text-anchor="middle">空</text>
+      <rect x="300" y="50" width="56" height="46" rx="5" class="empty"/><text x="328" y="70" class="tiny" text-anchor="middle">14</text><text x="328" y="83" class="tiny" text-anchor="middle">空</text>
+      <rect x="360" y="50" width="56" height="46" rx="5" class="empty"/><text x="388" y="70" class="tiny" text-anchor="middle">15</text><text x="388" y="83" class="tiny" text-anchor="middle">空</text>
+      <rect x="420" y="50" width="56" height="46" rx="5" class="empty"/><text x="448" y="70" class="tiny" text-anchor="middle">16</text><text x="448" y="83" class="tiny" text-anchor="middle">空</text>
+      <rect x="480" y="50" width="56" height="46" rx="5" class="empty"/><text x="508" y="70" class="tiny" text-anchor="middle">17</text><text x="508" y="83" class="tiny" text-anchor="middle">空</text>
+
+      <rect x="0" y="100" width="56" height="46" rx="5" class="reserved"/><text x="28" y="120" class="tiny" text-anchor="middle">18</text><text x="28" y="133" class="tiny" text-anchor="middle">边界</text>
+      <rect x="60" y="100" width="56" height="46" rx="5" class="mail"/><text x="88" y="120" class="tiny" text-anchor="middle">19</text><text x="88" y="133" class="tiny" text-anchor="middle">Mail</text>
+      <rect x="120" y="100" width="56" height="46" rx="5" class="mail"/><text x="148" y="120" class="tiny" text-anchor="middle">20</text><text x="148" y="133" class="tiny" text-anchor="middle">Mail</text>
+      <rect x="180" y="100" width="56" height="46" rx="5" class="mail"/><text x="208" y="120" class="tiny" text-anchor="middle">21</text><text x="208" y="133" class="tiny" text-anchor="middle">Mail</text>
+      <rect x="240" y="100" width="56" height="46" rx="5" class="mail"/><text x="268" y="120" class="tiny" text-anchor="middle">22</text><text x="268" y="133" class="tiny" text-anchor="middle">Mail</text>
+      <rect x="300" y="100" width="56" height="46" rx="5" class="mail"/><text x="328" y="120" class="tiny" text-anchor="middle">23</text><text x="328" y="133" class="tiny" text-anchor="middle">Mail</text>
+      <rect x="360" y="100" width="56" height="46" rx="5" class="mail"/><text x="388" y="120" class="tiny" text-anchor="middle">24</text><text x="388" y="133" class="tiny" text-anchor="middle">Mail</text>
+      <rect x="420" y="100" width="56" height="46" rx="5" class="mail"/><text x="448" y="120" class="tiny" text-anchor="middle">25</text><text x="448" y="133" class="tiny" text-anchor="middle">Mail</text>
+      <rect x="480" y="100" width="56" height="46" rx="5" class="reserved"/><text x="508" y="120" class="tiny" text-anchor="middle">26</text><text x="508" y="133" class="tiny" text-anchor="middle">边界</text>
+
+      <rect x="0" y="150" width="56" height="46" rx="5" class="empty"/><text x="28" y="170" class="tiny" text-anchor="middle">27</text><text x="28" y="183" class="tiny" text-anchor="middle">无上一页</text>
+      <rect x="60" y="150" width="56" height="46" rx="5" class="mail"/><text x="88" y="170" class="tiny" text-anchor="middle">28</text><text x="88" y="183" class="tiny" text-anchor="middle">Mail</text>
+      <rect x="120" y="150" width="56" height="46" rx="5" class="mail"/><text x="148" y="170" class="tiny" text-anchor="middle">29</text><text x="148" y="183" class="tiny" text-anchor="middle">Mail</text>
+      <rect x="180" y="150" width="56" height="46" rx="5" class="mail"/><text x="208" y="170" class="tiny" text-anchor="middle">30</text><text x="208" y="183" class="tiny" text-anchor="middle">Mail</text>
+      <rect x="240" y="150" width="56" height="46" rx="5" class="mail"/><text x="268" y="170" class="tiny" text-anchor="middle">31</text><text x="268" y="183" class="tiny" text-anchor="middle">Mail</text>
+      <rect x="300" y="150" width="56" height="46" rx="5" class="mail"/><text x="328" y="170" class="tiny" text-anchor="middle">32</text><text x="328" y="183" class="tiny" text-anchor="middle">Mail</text>
+      <rect x="360" y="150" width="56" height="46" rx="5" class="mail"/><text x="388" y="170" class="tiny" text-anchor="middle">33</text><text x="388" y="183" class="tiny" text-anchor="middle">Mail</text>
+      <rect x="420" y="150" width="56" height="46" rx="5" class="mail"/><text x="448" y="170" class="tiny" text-anchor="middle">34</text><text x="448" y="183" class="tiny" text-anchor="middle">Mail</text>
+      <rect x="480" y="150" width="56" height="46" rx="5" class="nav"/><text x="508" y="170" class="tiny" text-anchor="middle">35</text><text x="508" y="183" class="tiny" text-anchor="middle">Next</text>
+
+      <rect x="0" y="200" width="56" height="46" rx="5" class="reserved"/><text x="28" y="220" class="tiny" text-anchor="middle">36</text><text x="28" y="233" class="tiny" text-anchor="middle">边界</text>
+      <rect x="60" y="200" width="56" height="46" rx="5" class="mail"/><text x="88" y="220" class="tiny" text-anchor="middle">37</text><text x="88" y="233" class="tiny" text-anchor="middle">Mail</text>
+      <rect x="120" y="200" width="56" height="46" rx="5" class="mail"/><text x="148" y="220" class="tiny" text-anchor="middle">38</text><text x="148" y="233" class="tiny" text-anchor="middle">Mail</text>
+      <rect x="180" y="200" width="56" height="46" rx="5" class="mail"/><text x="208" y="220" class="tiny" text-anchor="middle">39</text><text x="208" y="233" class="tiny" text-anchor="middle">Mail</text>
+      <rect x="240" y="200" width="56" height="46" rx="5" class="mail"/><text x="268" y="220" class="tiny" text-anchor="middle">40</text><text x="268" y="233" class="tiny" text-anchor="middle">Mail</text>
+      <rect x="300" y="200" width="56" height="46" rx="5" class="mail"/><text x="328" y="220" class="tiny" text-anchor="middle">41</text><text x="328" y="233" class="tiny" text-anchor="middle">Mail</text>
+      <rect x="360" y="200" width="56" height="46" rx="5" class="mail"/><text x="388" y="220" class="tiny" text-anchor="middle">42</text><text x="388" y="233" class="tiny" text-anchor="middle">Mail</text>
+      <rect x="420" y="200" width="56" height="46" rx="5" class="mail"/><text x="448" y="220" class="tiny" text-anchor="middle">43</text><text x="448" y="233" class="tiny" text-anchor="middle">Mail</text>
+      <rect x="480" y="200" width="56" height="46" rx="5" class="reserved"/><text x="508" y="220" class="tiny" text-anchor="middle">44</text><text x="508" y="233" class="tiny" text-anchor="middle">边界</text>
+
+      <rect x="0" y="250" width="56" height="46" rx="5" class="empty"/><text x="28" y="270" class="tiny" text-anchor="middle">45</text><text x="28" y="283" class="tiny" text-anchor="middle">空</text>
+      <rect x="60" y="250" width="56" height="46" rx="5" class="empty"/><text x="88" y="270" class="tiny" text-anchor="middle">46</text><text x="88" y="283" class="tiny" text-anchor="middle">空</text>
+      <rect x="120" y="250" width="56" height="46" rx="5" class="empty"/><text x="148" y="270" class="tiny" text-anchor="middle">47</text><text x="148" y="283" class="tiny" text-anchor="middle">空</text>
+      <rect x="180" y="250" width="56" height="46" rx="5" class="empty"/><text x="208" y="270" class="tiny" text-anchor="middle">48</text><text x="208" y="283" class="tiny" text-anchor="middle">空</text>
+      <rect x="240" y="250" width="56" height="46" rx="5" class="empty"/><text x="268" y="270" class="tiny" text-anchor="middle">49</text><text x="268" y="283" class="tiny" text-anchor="middle">空</text>
+      <rect x="300" y="250" width="56" height="46" rx="5" class="empty"/><text x="328" y="270" class="tiny" text-anchor="middle">50</text><text x="328" y="283" class="tiny" text-anchor="middle">空</text>
+      <rect x="360" y="250" width="56" height="46" rx="5" class="empty"/><text x="388" y="270" class="tiny" text-anchor="middle">51</text><text x="388" y="283" class="tiny" text-anchor="middle">空</text>
+      <rect x="420" y="250" width="56" height="46" rx="5" class="empty"/><text x="448" y="270" class="tiny" text-anchor="middle">52</text><text x="448" y="283" class="tiny" text-anchor="middle">空</text>
+      <rect x="480" y="250" width="56" height="46" rx="5" class="empty"/><text x="508" y="270" class="tiny" text-anchor="middle">53</text><text x="508" y="283" class="tiny" text-anchor="middle">空</text>
+    </g>
+  </g>
+
+  <g transform="translate(650, 110)">
+    <rect x="0" y="0" width="350" height="168" rx="10" class="frame"/>
+    <text x="18" y="30" class="label">第二页实测</text>
+    <text x="18" y="50" class="subtitle">23 封邮件时，第二页只渲染 19、20 两个包裹槽。</text>
+    <rect x="28" y="78" width="56" height="46" rx="5" class="nav"/><text x="56" y="98" class="tiny" text-anchor="middle">27</text><text x="56" y="111" class="tiny" text-anchor="middle">Prev</text>
+    <rect x="98" y="78" width="56" height="46" rx="5" class="mail"/><text x="126" y="98" class="tiny" text-anchor="middle">19</text><text x="126" y="111" class="tiny" text-anchor="middle">Mail</text>
+    <rect x="168" y="78" width="56" height="46" rx="5" class="mail"/><text x="196" y="98" class="tiny" text-anchor="middle">20</text><text x="196" y="111" class="tiny" text-anchor="middle">Mail</text>
+    <rect x="238" y="78" width="56" height="46" rx="5" class="empty"/><text x="266" y="98" class="tiny" text-anchor="middle">35</text><text x="266" y="111" class="tiny" text-anchor="middle">无下一页</text>
+  </g>
+
+  <g transform="translate(650, 310)">
+    <rect x="0" y="0" width="350" height="168" rx="10" class="frame"/>
+    <text x="18" y="30" class="label">领取安全性实测</text>
+    <path d="M 36 78 H 142" stroke="#22d3ee" stroke-width="2" marker-end="url(#arrow-cyan)"/>
+    <text x="36" y="66" class="small">点击包裹</text>
+    <text x="156" y="82" class="small">CLAIMING</text>
+    <path d="M 214 78 H 306" stroke="#fbbf24" stroke-width="2" marker-end="url(#arrow-amber)"/>
+    <text x="216" y="66" class="small">发放物品</text>
+    <text x="40" y="122" class="subtitle">8 次快速点击同一槽位：最终 GOLD_INGOT = 1。</text>
+    <text x="40" y="142" class="subtitle">领取后断线重连：IRON_INGOT = 1，包裹不再可领。</text>
+  </g>
+
+  <g transform="translate(40, 590)">
+    <rect x="0" y="0" width="960" height="76" rx="10" class="frame"/>
+    <rect x="24" y="24" width="26" height="26" rx="4" class="mail"/><text x="62" y="42" class="small">邮件包裹槽</text>
+    <rect x="188" y="24" width="26" height="26" rx="4" class="nav"/><text x="226" y="42" class="small">分页按钮</text>
+    <rect x="342" y="24" width="26" height="26" rx="4" class="reserved"/><text x="380" y="42" class="small">边界/黑名单槽</text>
+    <rect x="540" y="24" width="26" height="26" rx="4" class="empty"/><text x="578" y="42" class="small">空槽</text>
+    <text x="736" y="42" class="subtitle">验证命令：npm.cmd run test:mineflayer</text>
+  </g>
+</svg>

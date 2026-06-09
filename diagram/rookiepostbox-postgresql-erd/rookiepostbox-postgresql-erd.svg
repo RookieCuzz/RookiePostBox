@@ -1,0 +1,233 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1860 1180">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&amp;display=swap');
+    text { font-family: 'JetBrains Mono', 'Noto Sans SC', 'PingFang SC', sans-serif; }
+    .title { fill: #e2e8f0; font-size: 20px; font-weight: 700; }
+    .subtitle { fill: #94a3b8; font-size: 10px; }
+    .entity-title { fill: #ffffff; font-size: 12px; font-weight: 700; }
+    .field { fill: #cbd5e1; font-size: 8px; }
+    .note-title { fill: #fbbf24; font-size: 10px; font-weight: 700; }
+    .note { fill: #cbd5e1; font-size: 8px; }
+    .card { fill: #94a3b8; font-size: 8px; font-weight: 600; }
+  </style>
+  <defs>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1e293b" stroke-width="0.5"/>
+    </pattern>
+  </defs>
+
+  <rect width="1860" height="1180" fill="#0f172a"/>
+  <rect width="1860" height="1180" fill="url(#grid)"/>
+
+  <text x="30" y="36" class="title">RookiePostBox PostgreSQL ERD</text>
+  <text x="30" y="56" class="subtitle">Core mailbox schema with player mail, attachments, audit trail, batch delivery, and idempotency support</text>
+
+  <!-- Relationship lines -->
+  <g stroke="#94a3b8" stroke-width="1.5" fill="none">
+    <line x1="320" y1="230" x2="520" y2="230"/>
+    <line x1="1030" y1="370" x2="1030" y2="515"/>
+    <line x1="1210" y1="230" x2="1440" y2="230"/>
+    <line x1="360" y1="810" x2="520" y2="810"/>
+    <line x1="1030" y1="770" x2="1030" y2="835"/>
+    <line x1="1210" y1="810" x2="1440" y2="810"/>
+  </g>
+
+  <!-- Crow foot helpers -->
+  <g stroke="#94a3b8" stroke-width="1.5">
+    <!-- post_boxes -> mail_packages -->
+    <line x1="505" y1="224" x2="520" y2="230"/>
+    <line x1="505" y1="236" x2="520" y2="230"/>
+    <line x1="505" y1="230" x2="520" y2="230"/>
+    <text x="332" y="221" class="card">1</text>
+    <text x="486" y="221" class="card">N</text>
+
+    <!-- mail_packages -> mail_items -->
+    <line x1="1024" y1="500" x2="1030" y2="515"/>
+    <line x1="1036" y1="500" x2="1030" y2="515"/>
+    <line x1="1030" y1="500" x2="1030" y2="515"/>
+    <text x="1040" y="500" class="card">N</text>
+    <text x="1040" y="384" class="card">1</text>
+
+    <!-- mail_packages -> mail_events -->
+    <line x1="1425" y1="224" x2="1440" y2="230"/>
+    <line x1="1425" y1="236" x2="1440" y2="230"/>
+    <line x1="1425" y1="230" x2="1440" y2="230"/>
+    <text x="1220" y="221" class="card">1</text>
+    <text x="1408" y="221" class="card">N</text>
+
+    <!-- mail_batches -> mail_batch_targets -->
+    <line x1="505" y1="804" x2="520" y2="810"/>
+    <line x1="505" y1="816" x2="520" y2="810"/>
+    <line x1="505" y1="810" x2="520" y2="810"/>
+    <text x="372" y="801" class="card">1</text>
+    <text x="486" y="801" class="card">N</text>
+
+    <!-- post_boxes -> mail_batch_targets -->
+    <line x1="1024" y1="820" x2="1030" y2="835"/>
+    <line x1="1036" y1="820" x2="1030" y2="835"/>
+    <line x1="1030" y1="820" x2="1030" y2="835"/>
+    <text x="1040" y="823" class="card">N</text>
+    <text x="1040" y="758" class="card">1</text>
+
+    <!-- mail_batch_targets -> mail_packages optional -->
+    <line x1="1425" y1="804" x2="1440" y2="810"/>
+    <line x1="1425" y1="816" x2="1440" y2="810"/>
+    <line x1="1425" y1="810" x2="1440" y2="810"/>
+    <text x="1222" y="801" class="card">0..1</text>
+    <text x="1400" y="801" class="card">1</text>
+  </g>
+
+  <!-- Entity: post_boxes -->
+  <g transform="translate(60,120)">
+    <rect width="260" height="220" rx="8" fill="#0f172a"/>
+    <rect width="260" height="220" rx="8" fill="rgba(8, 51, 68, 0.4)" stroke="#22d3ee" stroke-width="1.5"/>
+    <text x="130" y="24" class="entity-title" text-anchor="middle">post_boxes</text>
+    <line x1="0" y1="34" x2="260" y2="34" stroke="#22d3ee" stroke-width="0.8" stroke-opacity="0.5"/>
+    <text x="10" y="52" class="field">PK owner_uuid : UUID</text>
+    <text x="10" y="66" class="field">owner_name_cache : VARCHAR(32)</text>
+    <text x="10" y="80" class="field">mailbox_enabled : BOOLEAN</text>
+    <text x="10" y="94" class="field">unread_count : INTEGER</text>
+    <text x="10" y="108" class="field">last_opened_at : TIMESTAMPTZ</text>
+    <text x="10" y="122" class="field">created_at : TIMESTAMPTZ</text>
+    <text x="10" y="136" class="field">updated_at : TIMESTAMPTZ</text>
+    <line x1="0" y1="150" x2="260" y2="150" stroke="#22d3ee" stroke-width="0.8" stroke-opacity="0.5"/>
+    <text x="10" y="168" class="field">PK owner_uuid</text>
+    <text x="10" y="182" class="field">CHECK unread_count &gt;= 0</text>
+    <text x="10" y="196" class="field">IDX owner_name_cache (optional)</text>
+  </g>
+
+  <!-- Entity: mail_packages -->
+  <g transform="translate(520,90)">
+    <rect width="690" height="410" rx="8" fill="#0f172a"/>
+    <rect width="690" height="410" rx="8" fill="rgba(76, 29, 149, 0.4)" stroke="#a78bfa" stroke-width="1.5"/>
+    <text x="345" y="24" class="entity-title" text-anchor="middle">mail_packages</text>
+    <line x1="0" y1="34" x2="690" y2="34" stroke="#a78bfa" stroke-width="0.8" stroke-opacity="0.5"/>
+    <text x="10" y="52" class="field">PK id : BIGSERIAL</text>
+    <text x="10" y="66" class="field">mailbox_owner_uuid : UUID (logical ref to post_boxes)</text>
+    <text x="10" y="80" class="field">sender_uuid : UUID NULL</text>
+    <text x="10" y="94" class="field">sender_name_snapshot : VARCHAR(32)</text>
+    <text x="10" y="108" class="field">sender_type : mail_sender_type</text>
+    <text x="10" y="122" class="field">message_text : TEXT</text>
+    <text x="10" y="136" class="field">read_state : mail_read_state</text>
+    <text x="10" y="150" class="field">lifecycle_state : mail_lifecycle_state</text>
+    <text x="10" y="164" class="field">request_id : UUID NULL</text>
+    <text x="10" y="178" class="field">claim_token : UUID NULL</text>
+    <text x="10" y="192" class="field">version : INTEGER</text>
+    <text x="10" y="206" class="field">source_plugin : VARCHAR(64) NULL</text>
+    <text x="10" y="220" class="field">admin_note : TEXT NULL</text>
+    <text x="10" y="234" class="field">created_at : TIMESTAMPTZ</text>
+    <text x="10" y="248" class="field">read_at : TIMESTAMPTZ NULL</text>
+    <text x="10" y="262" class="field">claim_started_at : TIMESTAMPTZ NULL</text>
+    <text x="10" y="276" class="field">claimed_at : TIMESTAMPTZ NULL</text>
+    <text x="10" y="290" class="field">expires_at : TIMESTAMPTZ NULL</text>
+    <text x="10" y="304" class="field">deleted_at : TIMESTAMPTZ NULL</text>
+    <text x="10" y="318" class="field">updated_at : TIMESTAMPTZ</text>
+    <line x1="0" y1="332" x2="690" y2="332" stroke="#a78bfa" stroke-width="0.8" stroke-opacity="0.5"/>
+    <text x="10" y="350" class="field">UQ request_id WHERE NOT NULL</text>
+    <text x="10" y="364" class="field">UQ claim_token WHERE NOT NULL</text>
+    <text x="10" y="378" class="field">IDX (mailbox_owner_uuid, lifecycle_state, read_state, created_at DESC)</text>
+    <text x="10" y="392" class="field">IDX (sender_uuid, created_at DESC) | IDX expires_at WHERE active</text>
+  </g>
+
+  <!-- Entity: mail_events -->
+  <g transform="translate(1440,120)">
+    <rect width="330" height="220" rx="8" fill="#0f172a"/>
+    <rect width="330" height="220" rx="8" fill="rgba(136, 19, 55, 0.4)" stroke="#fb7185" stroke-width="1.5"/>
+    <text x="165" y="24" class="entity-title" text-anchor="middle">mail_events</text>
+    <line x1="0" y1="34" x2="330" y2="34" stroke="#fb7185" stroke-width="0.8" stroke-opacity="0.5"/>
+    <text x="10" y="52" class="field">PK id : BIGSERIAL</text>
+    <text x="10" y="66" class="field">package_id : BIGINT (logical ref to mail_packages)</text>
+    <text x="10" y="80" class="field">actor_uuid : UUID NULL</text>
+    <text x="10" y="94" class="field">actor_name_snapshot : VARCHAR(32)</text>
+    <text x="10" y="108" class="field">actor_type : mail_sender_type</text>
+    <text x="10" y="122" class="field">event_type : mail_event_type</text>
+    <text x="10" y="136" class="field">payload_json : JSONB</text>
+    <text x="10" y="150" class="field">created_at : TIMESTAMPTZ</text>
+    <line x1="0" y1="164" x2="330" y2="164" stroke="#fb7185" stroke-width="0.8" stroke-opacity="0.5"/>
+    <text x="10" y="182" class="field">IDX (package_id, created_at DESC)</text>
+    <text x="10" y="196" class="field">IDX (actor_uuid, created_at DESC)</text>
+    <text x="10" y="210" class="field">GIN payload_json</text>
+  </g>
+
+  <!-- Entity: mail_items -->
+  <g transform="translate(790,515)">
+    <rect width="480" height="255" rx="8" fill="#0f172a"/>
+    <rect width="480" height="255" rx="8" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1.5"/>
+    <text x="240" y="24" class="entity-title" text-anchor="middle">mail_items</text>
+    <line x1="0" y1="34" x2="480" y2="34" stroke="#34d399" stroke-width="0.8" stroke-opacity="0.5"/>
+    <text x="10" y="52" class="field">PK id : BIGSERIAL</text>
+    <text x="10" y="66" class="field">package_id : BIGINT (logical ref to mail_packages)</text>
+    <text x="10" y="80" class="field">slot_index : INTEGER</text>
+    <text x="10" y="94" class="field">item_kind : mail_item_kind</text>
+    <text x="10" y="108" class="field">material_key : VARCHAR(64) NULL</text>
+    <text x="10" y="122" class="field">display_name : TEXT NULL</text>
+    <text x="10" y="136" class="field">amount : INTEGER</text>
+    <text x="10" y="150" class="field">store_id : VARCHAR(128) NULL</text>
+    <text x="10" y="164" class="field">unique_key : VARCHAR(128) NULL</text>
+    <text x="10" y="178" class="field">base64_item : TEXT</text>
+    <text x="10" y="192" class="field">created_at : TIMESTAMPTZ</text>
+    <line x1="0" y1="206" x2="480" y2="206" stroke="#34d399" stroke-width="0.8" stroke-opacity="0.5"/>
+    <text x="10" y="224" class="field">UQ (package_id, slot_index)</text>
+    <text x="10" y="238" class="field">IDX (package_id, slot_index) | optional UQ unique_key</text>
+  </g>
+
+  <!-- Entity: mail_batches -->
+  <g transform="translate(60,700)">
+    <rect width="300" height="215" rx="8" fill="#0f172a"/>
+    <rect width="300" height="215" rx="8" fill="rgba(120, 53, 15, 0.3)" stroke="#fbbf24" stroke-width="1.5"/>
+    <text x="150" y="24" class="entity-title" text-anchor="middle">mail_batches</text>
+    <line x1="0" y1="34" x2="300" y2="34" stroke="#fbbf24" stroke-width="0.8" stroke-opacity="0.5"/>
+    <text x="10" y="52" class="field">PK id : BIGSERIAL</text>
+    <text x="10" y="66" class="field">request_id : UUID NULL</text>
+    <text x="10" y="80" class="field">created_by_uuid : UUID NULL</text>
+    <text x="10" y="94" class="field">created_by_name_snapshot : VARCHAR(32)</text>
+    <text x="10" y="108" class="field">status : mail_batch_status</text>
+    <text x="10" y="122" class="field">recipient_scope : VARCHAR(32)</text>
+    <text x="10" y="136" class="field">reason : TEXT NULL</text>
+    <text x="10" y="150" class="field">source_plugin : VARCHAR(64) NULL</text>
+    <text x="10" y="164" class="field">created_at : TIMESTAMPTZ</text>
+    <text x="10" y="178" class="field">completed_at : TIMESTAMPTZ NULL</text>
+    <line x1="0" y1="192" x2="300" y2="192" stroke="#fbbf24" stroke-width="0.8" stroke-opacity="0.5"/>
+    <text x="10" y="208" class="field">UQ request_id WHERE NOT NULL | IDX (status, created_at DESC)</text>
+  </g>
+
+  <!-- Entity: mail_batch_targets -->
+  <g transform="translate(520,835)">
+    <rect width="690" height="220" rx="8" fill="#0f172a"/>
+    <rect width="690" height="220" rx="8" fill="rgba(30, 41, 59, 0.5)" stroke="#94a3b8" stroke-width="1.5"/>
+    <text x="345" y="24" class="entity-title" text-anchor="middle">mail_batch_targets</text>
+    <line x1="0" y1="34" x2="690" y2="34" stroke="#94a3b8" stroke-width="0.8" stroke-opacity="0.5"/>
+    <text x="10" y="52" class="field">PK id : BIGSERIAL</text>
+    <text x="10" y="66" class="field">batch_id : BIGINT (logical ref to mail_batches)</text>
+    <text x="10" y="80" class="field">owner_uuid : UUID (logical ref to post_boxes)</text>
+    <text x="10" y="94" class="field">package_id : BIGINT NULL (logical ref to mail_packages)</text>
+    <text x="10" y="108" class="field">status : mail_batch_target_status</text>
+    <text x="10" y="122" class="field">error_message : TEXT NULL</text>
+    <text x="10" y="136" class="field">created_at : TIMESTAMPTZ</text>
+    <text x="10" y="150" class="field">processed_at : TIMESTAMPTZ NULL</text>
+    <line x1="0" y1="164" x2="690" y2="164" stroke="#94a3b8" stroke-width="0.8" stroke-opacity="0.5"/>
+    <text x="10" y="182" class="field">UQ (batch_id, owner_uuid)</text>
+    <text x="10" y="196" class="field">UQ package_id WHERE NOT NULL</text>
+    <text x="10" y="210" class="field">IDX (batch_id, status) | IDX (owner_uuid, created_at DESC)</text>
+  </g>
+
+  <!-- Note panel -->
+  <g transform="translate(1380,640)">
+    <rect width="400" height="320" rx="10" fill="#0f172a"/>
+    <rect width="400" height="320" rx="10" fill="rgba(120, 53, 15, 0.18)" stroke="#fbbf24" stroke-width="1.2" stroke-dasharray="8,4"/>
+    <text x="16" y="26" class="note-title">State &amp; Integrity Notes</text>
+    <text x="16" y="50" class="note">read_state: UNREAD | READ</text>
+    <text x="16" y="66" class="note">lifecycle_state: AVAILABLE | CLAIMING | CLAIMED | EXPIRED | DELETED | CLAIM_FAILED</text>
+    <text x="16" y="90" class="note">Single-send idempotency: mail_packages.request_id UNIQUE WHERE NOT NULL</text>
+    <text x="16" y="106" class="note">Batch idempotency: mail_batches.request_id + mail_batch_targets(batch_id, owner_uuid)</text>
+    <text x="16" y="130" class="note">Claim safety: use SELECT FOR UPDATE, claim_token, and version</text>
+    <text x="16" y="146" class="note">No DB foreign keys: ownership and cascade cleanup enforced in Service layer</text>
+    <text x="16" y="170" class="note">Mongo mapping:</text>
+    <text x="16" y="186" class="note">PostBox -&gt; post_boxes</text>
+    <text x="16" y="202" class="note">Package -&gt; mail_packages</text>
+    <text x="16" y="218" class="note">AbstractItem/AdminItem/NonAdminItem -&gt; mail_items</text>
+    <text x="16" y="242" class="note">Admin extensions:</text>
+    <text x="16" y="258" class="note">mail_batches + mail_batch_targets support compensation and bulk reward jobs</text>
+    <text x="16" y="282" class="note">Recommended implementation: Service transaction layer + repository layer</text>
+  </g>
+</svg>

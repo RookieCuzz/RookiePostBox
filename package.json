@@ -1,0 +1,12 @@
+{
+  "name": "rookiepostbox-integration-tests",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "test:mineflayer": "node tests/mineflayer/rookiepostbox.integration.test.js"
+  },
+  "dependencies": {
+    "mineflayer": "^4.31.0"
+  }
+}

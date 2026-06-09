@@ -39,6 +39,10 @@ public final class ItemBuilder {
         return of(material).displayName(displayName);
     }
 
+    public static @NotNull String colorize(@NotNull String text) {
+        return ChatColor.translateAlternateColorCodes('&', text);
+    }
+
     public ItemBuilder meta(@NotNull Consumer<ItemMeta> metaConsumer) {
         metaConsumer.accept(this.meta);
         return this;
@@ -53,7 +57,7 @@ public final class ItemBuilder {
     }
 
     public ItemBuilder displayName(@NotNull String displayName) {
-        return this.meta((meta) -> meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', displayName)));
+        return this.meta((meta) -> meta.setDisplayName(colorize(displayName)));
     }
 
     public ItemBuilder lore(@NotNull List<String> lore) {
@@ -61,7 +65,7 @@ public final class ItemBuilder {
             List<String> loreList = new ArrayList<>();
 
             for (String s : lore) {
-                loreList.add(ChatColor.translateAlternateColorCodes('&', s));
+                loreList.add(colorize(s));
             }
 
             this.meta.setLore(loreList);

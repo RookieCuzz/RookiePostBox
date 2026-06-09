@@ -1,109 +1,87 @@
 package com.cuzz.rookiepostbox.command;
 
 import com.cuzz.rookiepostbox.RookiePostBox;
-import com.cuzz.rookiepostbox.menu.pagination.PostBoxMenu;
-import com.cuzz.rookiepostbox.model.Package;
-import com.cuzz.rookiepostbox.model.item.AdminItem;
-import com.cuzz.rookiepostbox.nms.Toast;
+import com.cuzz.rookiepostbox.config.RookiePostBoxProperties;
+import com.cuzz.rookiepostbox.menu.facade.MenuFacade;
+import com.cuzz.rookiepostbox.service.spi.AdminMailboxService;
+import com.cuzz.rookiepostbox.service.spi.MailboxService;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Date;
+import java.util.function.Supplier;
 
-/**
- * RookiePostBox插件的命令执行器
- * 处理所有与邮箱相关的命令
- */
-public class PostBoxCommandExecutor implements CommandExecutor {
+public final class PostBoxCommandExecutor implements CommandExecutor {
 
-    private final RookiePostBox plugin;
+    private final Supplier<PlayerMailboxCommandHandler> playerHandlerSupplier;
+    private final Supplier<AdminMailboxCommandHandler> adminHandlerSupplier;
+    private final Supplier<Boolean> reloadAction;
 
     public PostBoxCommandExecutor(RookiePostBox plugin) {
-        this.plugin = plugin;
+        this(
+                () -> new PlayerMailboxCommandHandler(
+                        plugin.getApplicationContext().get(MenuFacade.class),
+                        plugin.getApplicationContext().get(MailboxService.class),
+                        plugin.getApplicationContext().get(RookiePostBoxProperties.class),
+                        new BukkitOfflinePlayerResolver(),
+                        new ToastPlayerMailFeedback(),
+                        new OdalitaMailComposeMenuOpener()
+                ),
+                () -> new AdminMailboxCommandHandler(
+                        plugin.getApplicationContext().get(AdminMailboxService.class),
+                        new BukkitOfflinePlayerResolver(),
+                        new OdalitaMailComposeMenuOpener()
+                ),
+                () -> {
+                    plugin.reloadConfig();
+                    plugin.getApplicationContext().get(RookiePostBoxProperties.class).reload();
+                    return true;
+                }
+        );
+    }
+
+    PostBoxCommandExecutor(
+            Supplier<PlayerMailboxCommandHandler> playerHandlerSupplier,
+            Supplier<AdminMailboxCommandHandler> adminHandlerSupplier,
+            Supplier<Boolean> reloadAction
+    ) {
+        this.playerHandlerSupplier = playerHandlerSupplier;
+        this.adminHandlerSupplier = adminHandlerSupplier;
+        this.reloadAction = reloadAction;
     }
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
-        if (!(sender instanceof Player player)) {
-            sender.sendMessage("此命令只能由玩家执行！");
-            return true;
-        }
-
         if (args.length == 0) {
-            player.sendMessage("请使用 /rookiepostbox menu 或 /rookiepostbox save <消息>");
+            sender.sendMessage("Usage: /rookiepostbox menu | save <message> | send <player> <message> | reload | admin <inbox|grant|grantall|delete> ...");
             return true;
         }
 
-        switch (args[0].toLowerCase()) {
-            case "menu" -> {
-                openPostBoxMenu(player);
+        if ("admin".equalsIgnoreCase(args[0])) {
+            if (!sender.hasPermission("rookiepostbox.admin")) {
+                sender.sendMessage("You do not have permission to use admin mailbox commands.");
                 return true;
             }
-            case "save" -> {
-                return handleSaveCommand(player, args);
-            }
-            default -> {
-                player.sendMessage("未知命令！请使用 /rookiepostbox menu 或 /rookiepostbox save <消息>");
+            return adminHandlerSupplier.get().handle(sender, args);
+        }
+
+        if ("reload".equalsIgnoreCase(args[0])) {
+            if (!sender.hasPermission("rookiepostbox.admin")) {
+                sender.sendMessage("You do not have permission to reload RookiePostBox.");
                 return true;
             }
-        }
-    }
-
-    /**
-     * 打开邮箱菜单
-     */
-    private void openPostBoxMenu(Player player) {
-        plugin.getOdalitaMenus().openMenu(new PostBoxMenu(), player);
-    }
-
-    /**
-     * 处理保存命令
-     */
-    private boolean handleSaveCommand(Player player, String[] args) {
-        if (args.length != 2) {
-            player.sendMessage("请输入/rookiepostbox save 消息内容");
-            return false;
+            boolean reloaded = reloadAction.get();
+            sender.sendMessage(reloaded ? "RookiePostBox config reloaded." : "RookiePostBox config reload failed.");
+            return true;
         }
 
-        ItemStack item = player.getInventory().getItemInMainHand();
-        if (item.getType().isAir()) {
-            player.sendMessage("请先选择一个物品");
-            return false;
+        if (!(sender instanceof Player player)) {
+            sender.sendMessage("This command can only be used by a player.");
+            return true;
         }
 
-        // 创建包裹
-        Package aPackage = Package.builder()
-                .ownerUUID(player.getUniqueId().toString())
-                .senderName(player.getName())
-                .message(args[1])
-                .createTime(new Date())
-                .build();
-
-        // 创建管理员物品
-        AdminItem adminItem = new AdminItem();
-        adminItem.setAmount(item.getAmount());
-        adminItem.setStoreID("测试商品");
-        adminItem.setBukkitItem(item);
-        adminItem.setItemDisplayName(item.getItemMeta().hasDisplayName() 
-                ? item.getItemMeta().getDisplayName() 
-                : item.getType().name());
-        
-        String serializedItem = adminItem.serializeItemStackToBase64(item);
-        adminItem.setBase64Item(serializedItem);
-        aPackage.addItem(adminItem);
-
-        // 保存到数据库
-        boolean success = plugin.getMongoDbManager().addPackageToPostBox(aPackage, player, true);
-        System.out.println(success ? "保存成功" : "保存失败");
-
-        // 显示Toast通知
-        Toast.displayTo(player, item.getType().toString().toLowerCase(), 
-                "已发送：" + args[1], Toast.Style.TASK);
-
-        return true;
+        return playerHandlerSupplier.get().handle(player, args);
     }
 }

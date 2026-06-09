@@ -1,18 +1,15 @@
 package com.cuzz.rookiepostbox.menu.pagination;
+
 import com.cuzz.rookiepostbox.RookiePostBox;
-import com.cuzz.rookiepostbox.database.Cache;
-import com.cuzz.rookiepostbox.menu.common.ItemBuilder;
-import com.cuzz.rookiepostbox.model.Package;
-import com.cuzz.rookiepostbox.model.PostBox;
-import com.cuzz.rookiepostbox.model.item.AbstractItem;
-import me.trytofeel.rookiefonts.RookieFonts;
-import me.trytofeel.rookiefonts.entity.Template;
-import me.trytofeel.rookiefonts.manager.TemplateManager;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
+import com.cuzz.rookiepostbox.cache.MailboxPageStateCache;
+import com.cuzz.rookiepostbox.config.RookiePostBoxProperties;
+import com.cuzz.rookiepostbox.menu.detail.MailDetailMenu;
+import com.cuzz.rookiepostbox.service.ClaimPackageAttachmentsResult;
+import com.cuzz.rookiepostbox.service.ClaimPackageResult;
+import com.cuzz.rookiepostbox.service.MailboxMailView;
+import com.cuzz.rookiepostbox.service.spi.MailboxService;
 import nl.odalitadevelopments.menus.annotations.Menu;
 import nl.odalitadevelopments.menus.contents.MenuContents;
-import nl.odalitadevelopments.menus.items.ClickableItem;
 import nl.odalitadevelopments.menus.iterators.MenuIterator;
 import nl.odalitadevelopments.menus.iterators.MenuIteratorType;
 import nl.odalitadevelopments.menus.menu.MenuSession;
@@ -20,216 +17,178 @@ import nl.odalitadevelopments.menus.menu.providers.PlayerMenuProvider;
 import nl.odalitadevelopments.menus.menu.type.MenuType;
 import nl.odalitadevelopments.menus.pagination.Pagination;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataContainer;
 import org.jetbrains.annotations.NotNull;
-import org.bukkit.NamespacedKey;
-import org.bukkit.persistence.PersistentDataType;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 
-@Menu(
-        title = "Pagination Example",
-        type = MenuType.CHEST_6_ROW
-)
+import java.util.function.Supplier;
+
+@Menu(title = "Rookie Post Box", type = MenuType.CHEST_6_ROW)
 public final class PostBoxMenu implements PlayerMenuProvider {
 
-    public static Map<Player, Pagination> cacheMenu;
+    private static final MailboxMenuItemFactory DEFAULT_ITEM_FACTORY = new MailboxMenuItemFactory();
 
-    static List<ItemStack> list = new ArrayList<>();
-    static int currentPageX = 0;
-    static {
-        for (int i = 0 + 1; i < 66; i++) { // Add 36 * 2 (2 pages) of items
-            final int finalIndex = i;
-            ItemStack item = ItemBuilder.of(Material.BRICK, "测试邮件" + finalIndex).lore("左键领取").build();
-            ItemMeta itemMeta = item.getItemMeta();
-            itemMeta.setCustomModelData(40005);
-            item.setItemMeta(itemMeta);
-            list.add(item);
-        }
+    private final Supplier<MailboxService> mailboxServiceSupplier;
+    private final Supplier<MailboxPageStateCache> pageStateCacheSupplier;
+    private final Supplier<RookiePostBoxProperties> propertiesSupplier;
+    private final Supplier<MailboxMenuItemFactory> itemFactorySupplier;
+    private final Supplier<MailboxMenuTitleService> titleServiceSupplier;
 
-    }
+    private Pagination pagination;
 
-    static ItemStack itemStackNext, itemStackPrevious;
-    static {
-        itemStackNext = new ItemStack(Material.BRICK);
-        ItemMeta itemMeta = itemStackNext.getItemMeta();
-        itemMeta.setDisplayName("下一页");
-        itemMeta.setItemModel(new NamespacedKey("oraxen", "mailbox_next"));
-        itemStackNext.setItemMeta(itemMeta);
-        itemStackPrevious = new ItemStack(Material.BRICK);
-        itemMeta.setDisplayName("上一页");
-        itemMeta.setItemModel(new NamespacedKey("oraxen", "mailbox_previous"));
-        itemStackPrevious.setItemMeta(itemMeta);
-    }
-
-    Pagination pagination;
-
-    public void handler(InventoryClickEvent event) {
-        Player player = (Player)event.getWhoClicked();
-        String name = player.getName();
-        player.sendMessage("邮箱>>> 正在收取 " + event.getCurrentItem().getItemMeta().getDisplayName());
-        ItemStack currentItem = event.getCurrentItem();
-        AtomicBoolean success = new AtomicBoolean(true);
-        Optional.of(currentItem).ifPresent(
-                (itemStack)->{
-                    ItemMeta itemMeta = itemStack.getItemMeta();
-                    PersistentDataContainer persistentDataContainer = itemMeta.getPersistentDataContainer();
-
-                    // 创建一个 NamespacedKey
-                    NamespacedKey key = new NamespacedKey("rpostbox", "packagedisplay");
-                    // 设置值
-                    PostBox playerPostBox = Cache.postBoxes.get(player.getName());
-                    if (playerPostBox == null){
-                        playerPostBox = RookiePostBox.getInstance().getMongoDbManager().getPostBoxByPlayer(player);
-                    }
-                    String packageId = persistentDataContainer.get(key, PersistentDataType.STRING);
-                    playerPostBox.getPackages().forEach(packagex -> {
-                        if (packagex.getId().toString().equals(packageId)){
-                            packagex.getItemContent().forEach(item -> {
-                                if(player.getInventory().firstEmpty() == -1){
-                                    player.sendMessage("邮箱>>> 你的背包已满，请清理后再领取！");
-                                    success.set(false);
-                                    return;
-                                }
-                                player.getInventory().addItem(item.getBukkitItem());
-                                player.sendMessage("邮箱>>> 获得了: " + item.getItemDisplayName() + " x " + item.getAmount());
-                            });
-                        }
-                    });
-                    if(!success.get()) {
-                        return;
-                    }
-                    RookiePostBox.getInstance().getMongoDbManager().deletePackageFromPostBox(packageId, playerPostBox);
-                }
+    public PostBoxMenu() {
+        this(
+                () -> RookiePostBox.getInstance().getApplicationContext().get(MailboxService.class),
+                () -> RookiePostBox.getInstance().getApplicationContext().get(MailboxPageStateCache.class),
+                () -> RookiePostBox.getInstance().getApplicationContext().get(RookiePostBoxProperties.class),
+                () -> DEFAULT_ITEM_FACTORY,
+                MailboxMenuTitleService::new
         );
-        if(!success.get()) {
-            return;
-        }
-        int startSlot = pagination.iterator().getStartSlotPos().getSlot();
-        ItemStack item = event.getClickedInventory().getItem(startSlot + 2);
-        boolean lastOne = false;
-        if (item == null || item.getType().isAir()){
-            lastOne = true;
-        }
+    }
 
-        boolean lastPage = pagination.isLastPage();
-        if (lastPage && startSlot == event.getSlot() - 1 && lastOne){
-            currentPageX = Math.max(pagination.currentPage() - 1,0);
-            System.out.println("修改！");
-        }else {
-            currentPageX = pagination.currentPage();
-        }
-
-        MenuSession openMenuSession = RookiePostBox.getInstance().getOdalitaMenus().getOpenMenuSession(player.getPlayer());
-
-        RookiePostBox.getInstance().getOdalitaMenus().openMenuBuilder(new PostBoxMenu(), (Player) player)
-                .pagination("mail_pagination", currentPageX) // Use same id as provided in the menu
-                .open();
-        Map<String, Map<String, String>> playerPlaceholderHashMap = RookieFonts.getInstance().getPlayerPlaceholderHashMap();
-        Map<String, String> stringStringMap = playerPlaceholderHashMap.get(player.getName());
-        if(stringStringMap == null){
-            stringStringMap = new HashMap<>();
-        }
-        stringStringMap.put("%currentPage%",String.valueOf(currentPageX + 1));
-        stringStringMap.put("%pageAmount%",String.valueOf(pagination.lastPage() + 1));
-        playerPlaceholderHashMap.put(player.getName(),stringStringMap);
-
-        Template maiTemplate = RookieFonts.getInstance().getTemplateManager().getTemplateHashMap().get("mail");
-        Component defaultComponentByString = maiTemplate.getDefaultComponent(player.getName());
-        String jsonText = GsonComponentSerializer.gson().serialize(defaultComponentByString);
-        if (openMenuSession != null) {
-            openMenuSession.getMenuContents().setTitle(jsonText);
-        }
+    PostBoxMenu(
+            Supplier<MailboxService> mailboxServiceSupplier,
+            Supplier<MailboxPageStateCache> pageStateCacheSupplier,
+            Supplier<RookiePostBoxProperties> propertiesSupplier,
+            Supplier<MailboxMenuItemFactory> itemFactorySupplier,
+            Supplier<MailboxMenuTitleService> titleServiceSupplier
+    ) {
+        this.mailboxServiceSupplier = mailboxServiceSupplier;
+        this.pageStateCacheSupplier = pageStateCacheSupplier;
+        this.propertiesSupplier = propertiesSupplier;
+        this.itemFactorySupplier = itemFactorySupplier;
+        this.titleServiceSupplier = titleServiceSupplier;
     }
 
     @Override
     public void onLoad(@NotNull Player player, @NotNull MenuContents contents) {
-        MenuIterator iterator = contents.createIterator("TESTP", MenuIteratorType.HORIZONTAL, 2, 0);
-        iterator.blacklist(9,18,27,36,17,26,35,45);
-        pagination = contents.pagination("mail_pagination", 21) // 21 items per page
-                .asyncPageSwitching(false) // Optionally, default is false
+        MenuIterator iterator = contents.createIterator("mail-grid", MenuIteratorType.HORIZONTAL, 2, 0);
+        iterator.blacklist(9, 18, 27, 36, 17, 26, 35, 45);
+        pagination = contents.pagination("mail_pagination", properties().getPageSize())
+                .asyncPageSwitching(false)
                 .iterator(iterator)
                 .create();
-        PostBox playerPostBox = Cache.postBoxes.get(player.getName());
-        if(playerPostBox == null) {
-            playerPostBox = RookiePostBox.getInstance().getMongoDbManager().getPostBoxByPlayer(player);
+
+        for (MailboxMailView mail : mailboxService().getInbox(player)) {
+            pagination.addItem(() -> itemFactory().createPackageItem(mail, properties().getMenu().getMailItem(), this::handleMailClick));
         }
-        if(playerPostBox == null) {
-            RookiePostBox.getInstance().getMongoDbManager().createNewPostBox(player.getUniqueId().toString(),player.getName());
-            playerPostBox = RookiePostBox.getInstance().getMongoDbManager().getPostBoxByPlayer(player);
-        }
-        List<Package> packages = playerPostBox.getPackages();
 
-        for (Package packagex:packages) {
-            pagination.addItem(() -> {
-//                ItemStack bukkitItem = packagex.getItemContent().get(0).getBukkitItem();
-                ItemStack bukkitItem = new ItemStack(Material.BRICK);
-                ItemMeta itemMeta = bukkitItem.getItemMeta();
-                PersistentDataContainer persistentDataContainer = itemMeta.getPersistentDataContainer();
-
-                // 创建一个 NamespacedKey
-                NamespacedKey key = new NamespacedKey("oraxen","unopened_box");
-                itemMeta.setItemModel(key);
-                itemMeta.setDisplayName(ChatColor.BOLD + "来自 " + packagex.getSenderName() + " 的邮件");
-                List<String> itemLore = new ArrayList<>();
-                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                AbstractItem mailItem = packagex.getItemContent().get(0);
-                itemLore.add(ChatColor.WHITE + packagex.getMessage());
-                itemLore.add(ChatColor.GRAY + "----------");
-                itemLore.add(ChatColor.GRAY + "发送时间: " + dateFormat.format(packagex.getCreateTime()));
-                itemLore.add(ChatColor.GREEN + "邮件内容: " + mailItem.getItemDisplayName() + "x" + mailItem.getAmount());
-                itemMeta.setLore(itemLore);
-                // 设置值
-                key = new NamespacedKey("rpostbox", "packagedisplay");
-                persistentDataContainer.set(key, PersistentDataType.STRING, packagex.getId().toString());
-
-                bukkitItem.setItemMeta(itemMeta);
-
-                return ClickableItem.of(bukkitItem, this::handler);
-            });
-        }
-        Map<String, Map<String, String>> playerPlaceholderHashMap = RookieFonts.getInstance().getPlayerPlaceholderHashMap();
-        Map<String, String> stringStringMap =playerPlaceholderHashMap.get(player.getName());
-        if(stringStringMap == null){
-            stringStringMap = new HashMap<>();
-        }
-        stringStringMap.put("%currentPage%",String.valueOf(currentPageX + 1));
-        stringStringMap.put("%pageAmount%",String.valueOf(pagination.lastPage() + 1));
-        playerPlaceholderHashMap.put(player.getName(),stringStringMap);
-        TemplateManager templateManager = RookieFonts.getInstance().getTemplateManager();
-        Template template = templateManager.getTemplateHashMap().get("mail");
-        Component defaultComponentByString = template.getDefaultComponent(player.getName());
-        String jsonText = GsonComponentSerializer.gson().serialize(defaultComponentByString);
-
-        contents.setTitle(jsonText);
-        contents.set(27, MailPageItem.previous(pagination,itemStackPrevious,false)); // Create previous page item with the itemstack provided in DefaultItemProvider
-        contents.set(35, MailPageItem.next(pagination,itemStackNext,false)); // Create next page item with the itemstack provided in DefaultItemProvider
-
-        contents.events().onInventoryEvent(InventoryClickEvent.class, inventoryClickEvent -> {
-
-            Bukkit.getScheduler().runTaskLater(RookiePostBox.getInstance(), () -> {
-                Map<String, String> ssM = playerPlaceholderHashMap.get(player.getName());
-                if(ssM == null){
-                    ssM = new HashMap<>();
-                }
-                ssM.put("%currentPage%",String.valueOf(pagination.currentPage() + 1));
-                ssM.put("%pageAmount%",String.valueOf(pagination.lastPage() + 1));
-                playerPlaceholderHashMap.put(player.getName(),ssM);
-
-                Template t = templateManager.getTemplateHashMap().get("mail");
-                Component dC = t.getDefaultComponent(player.getName());
-                String j = GsonComponentSerializer.gson().serialize(dC);
-
-                contents.setTitle(j);
-            }, 2);
-
+        titleService().applyTitle(player, contents, pagination, pageStateCache(), properties().getMenu().getTitleTemplate());
+        contents.set(27, MailPageItem.previous(
+                pagination,
+                (currentPage, pageAmount) -> itemFactory().createNavigationItem(
+                        properties().getMenu().getPreviousButton(),
+                        currentPage,
+                        pageAmount
+                ),
+                false
+        ));
+        contents.set(35, MailPageItem.next(
+                pagination,
+                (currentPage, pageAmount) -> itemFactory().createNavigationItem(
+                        properties().getMenu().getNextButton(),
+                        currentPage,
+                        pageAmount
+                ),
+                false
+        ));
+        contents.events().onInventoryEvent(InventoryClickEvent.class, event -> {
+            if (isPaginationControl(event)) {
+                scheduleTitleRefresh(player, contents);
+            }
         });
+    }
+
+    private void handleMailClick(InventoryClickEvent event) {
+        Player player = (Player) event.getWhoClicked();
+        String mailId = itemFactory().extractMailId(event.getCurrentItem());
+        if (mailId == null) {
+            return;
+        }
+
+        if (event.getClick() == ClickType.SHIFT_LEFT) {
+            quickClaim(player, mailId, event);
+            return;
+        }
+        if (event.getClick() == ClickType.LEFT) {
+            openMailDetail(player, mailId);
+        }
+    }
+
+    private void quickClaim(Player player, String mailId, InventoryClickEvent event) {
+        player.sendMessage("Mailbox >>> Claiming package " + mailId);
+        ClaimPackageResult result = mailboxService().claimPackage(player, mailId);
+        if (!result.isSuccess()) {
+            player.sendMessage(result.getMessage());
+            return;
+        }
+
+        int reopenPage = calculateReopenPage(event);
+        pageStateCache().setCurrentPage(player.getUniqueId(), reopenPage);
+        MenuSession openMenuSession = RookiePostBox.getInstance().getOdalitaMenus().getOpenMenuSession(player);
+
+        RookiePostBox.getInstance().getOdalitaMenus().openMenuBuilder(new PostBoxMenu(), player)
+                .pagination("mail_pagination", reopenPage)
+                .open();
+
+        titleService().syncOpenSessionTitle(player, openMenuSession, pagination, pageStateCache(), properties().getMenu().getTitleTemplate());
+    }
+
+    private void openMailDetail(Player player, String mailId) {
+        ClaimPackageAttachmentsResult result = mailboxService().previewPackageAttachments(player, mailId);
+        if (!result.isSuccess()) {
+            player.sendMessage(result.getMessage());
+            return;
+        }
+
+        RookiePostBox.getInstance().getOdalitaMenus().openMenuBuilder(
+                        new MailDetailMenu(result, properties().getMenu().getDetailTitleTemplate(), mailboxService()),
+                        player
+                )
+                .open();
+    }
+
+    private int calculateReopenPage(InventoryClickEvent event) {
+        int startSlot = pagination.iterator().getStartSlotPos().getSlot();
+        ItemStack item = event.getClickedInventory().getItem(startSlot + 2);
+        boolean lastItemOnPage = item == null || item.getType().isAir();
+        if (pagination.isLastPage() && startSlot == event.getSlot() - 1 && lastItemOnPage) {
+            return Math.max(pagination.currentPage() - 1, 0);
+        }
+        return pagination.currentPage();
+    }
+
+    private void scheduleTitleRefresh(Player player, MenuContents contents) {
+        Bukkit.getScheduler().runTaskLater(
+                RookiePostBox.getInstance(),
+                () -> titleService().refreshTitle(player, contents, pagination, pageStateCache(), properties().getMenu().getTitleTemplate()),
+                2
+        );
+    }
+
+    private boolean isPaginationControl(InventoryClickEvent event) {
+        return event.getSlot() == 27 || event.getSlot() == 35;
+    }
+
+    private MailboxService mailboxService() {
+        return mailboxServiceSupplier.get();
+    }
+
+    private MailboxPageStateCache pageStateCache() {
+        return pageStateCacheSupplier.get();
+    }
+
+    private RookiePostBoxProperties properties() {
+        return propertiesSupplier.get();
+    }
+
+    private MailboxMenuItemFactory itemFactory() {
+        return itemFactorySupplier.get();
+    }
+
+    private MailboxMenuTitleService titleService() {
+        return titleServiceSupplier.get();
     }
 }

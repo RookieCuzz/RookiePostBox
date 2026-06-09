@@ -1,46 +1,56 @@
 package com.cuzz.rookiepostbox.api;
 
 import com.cuzz.rookiepostbox.RookiePostBox;
-import com.cuzz.rookiepostbox.database.MongoDBManager;
-import com.cuzz.rookiepostbox.model.Package;
-import com.cuzz.rookiepostbox.model.PostBox;
-import com.cuzz.rookiepostbox.model.item.AdminItem;
+import com.cuzz.rookiepostbox.api.spi.RookiePostBoxApi;
+import com.cuzz.rookiepostbox.service.MailboxMailView;
+import com.cuzz.rookiepostbox.service.SendMailResult;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
+@Deprecated(forRemoval = false)
 public class PackageAPI {
-    public void sendPackage(@NotNull Player sender, @NotNull Player receiver, @NotNull String message, @NotNull ItemStack item){ //发送包裹
-        com.cuzz.rookiepostbox.model.Package aPackage = Package.builder().ownerUUID(sender.getUniqueId().toString())
-                .senderName(sender.getName())
-                .message(message)
-                .createTime(new Date()).build();
-        AdminItem adminItem = new AdminItem();
-        adminItem.setAmount(item.getAmount());
-        adminItem.setStoreID("测试商品");
-        adminItem.setBukkitItem(item);
-        adminItem.setItemDisplayName(item.getItemMeta().hasDisplayName() ? item.getItemMeta().getDisplayName() : item.getType().name());
-        String string = adminItem.serializeItemStackToBase64(item);
-        adminItem.setBase64Item(string);
-        aPackage.addItem(adminItem);
-        boolean t = RookiePostBox.getInstance().getMongoDbManager().addPackageToPostBox(aPackage, receiver, true);
+
+    public long sendPackage(@NotNull Player sender, @NotNull Player receiver, @NotNull String message, @NotNull ItemStack item) {
+        return api().sendPackage(
+                sender.getUniqueId(),
+                sender.getName(),
+                receiver.getUniqueId(),
+                receiver.getName(),
+                message,
+                item
+        ).getPackageId();
     }
 
-    public void deletePackage(@NotNull Player player, @NotNull String packageID){
-        PostBox postBox = RookiePostBox.getInstance().getMongoDbManager().getPostBoxByPlayer(player);
-        boolean t = RookiePostBox.getInstance().getMongoDbManager().deletePackageFromPostBox(packageID, postBox);
+    public SendMailResult sendPackageWithRequestId(@NotNull Player sender,
+                                                   @NotNull Player receiver,
+                                                   @NotNull String message,
+                                                   @NotNull ItemStack item,
+                                                   @NotNull UUID requestId) {
+        return api().sendPackage(
+                sender.getUniqueId(),
+                sender.getName(),
+                receiver.getUniqueId(),
+                receiver.getName(),
+                message,
+                item,
+                requestId
+        );
     }
 
-    public List<String> getPackageIdsByPlayer(@NotNull Player player){
+    public List<String> getPackageIdsByPlayer(@NotNull Player player) {
         List<String> packages = new ArrayList<>();
-        PostBox postBox = RookiePostBox.getInstance().getMongoDbManager().getPostBoxByPlayer(player);
-        if (postBox != null){
-            postBox.getPackages().forEach(packagex -> packages.add(packagex.getId().toString()));
+        for (MailboxMailView mail : api().getInbox(player)) {
+            packages.add(mail.getMailId());
         }
         return packages;
+    }
+
+    private RookiePostBoxApi api() {
+        return RookiePostBox.getInstance().getApplicationContext().get(RookiePostBoxApi.class);
     }
 }

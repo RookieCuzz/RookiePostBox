@@ -2,9 +2,18 @@ name: RookiePostBox
 version: '${project.version}'
 main: com.cuzz.rookiepostbox.RookiePostBox
 api-version: '1.20'
-depends:
+depend:
+  - BukkitSpring
   - OdalitaMenus
   - RookieFonts
 commands:
-  RookiePostBox:
-    permission: RookiePostBox.*
+  rookiepostbox:
+    aliases: [postbox]
+    permission: rookiepostbox.use
+permissions:
+  rookiepostbox.use:
+    default: true
+  rookiepostbox.send:
+    default: true
+  rookiepostbox.admin:
+    default: op

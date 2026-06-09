@@ -1,0 +1,106 @@
+rookiepostbox:
+  debug: false
+
+  database:
+    schema: public
+
+  mail:
+    page-size: 21
+    max-inbox-mails: 200
+    default-expire-days: 30
+    allow-player-send: false
+    allow-offline-send: true
+
+  claim:
+    recover-claiming-after-seconds: 120
+    enable-claim-failed-retry: true
+
+  maintenance:
+    interval-seconds: 60
+
+  notification:
+    join:
+      enabled: true
+      delay-ticks: 40
+      message: "&eMailbox &7>> &fYou have &a%unread% &funread mail. Use &b/rookiepostbox menu &fto open it."
+
+  menu:
+    title-template: letter
+    detail-title-template: letter_detail
+    buttons:
+      previous:
+        material: BRICK
+        custom-model-data: 21001
+        display-name: "&ePrevious Page"
+        lore:
+          - "&8Mailbox Navigation"
+          - ""
+          - "&7Go to the previous page."
+          - "&fPage: &e%currentPage% &7/ &e%pageAmount%"
+          - ""
+          - "&aClick to switch"
+      next:
+        material: BRICK
+        custom-model-data: 21002
+        display-name: "&eNext Page"
+        lore:
+          - "&8Mailbox Navigation"
+          - ""
+          - "&7Go to the next page."
+          - "&fPage: &e%currentPage% &7/ &e%pageAmount%"
+          - ""
+          - "&aClick to switch"
+    mail-item:
+      material: BUNDLE
+      custom-model-data: 21003
+      unread-display-name: "&6&lNew Mail &ffrom &e%sender%"
+      read-display-name: "&fMail &7from &f%sender%"
+      lore:
+        - "&8Mail #%mailId%"
+        - ""
+        - "&fSender: &e%sender%"
+        - "&fStatus: %status%"
+        - "&fCreated: &b%createdAt%"
+        - "&fExpires: &b%expiresAt%"
+        - ""
+        - "&fMessage:"
+        - "&7%message%"
+        - ""
+        - "&aLeft click to claim attachments"
+
+mybatis:
+  enabled: true
+  debug: false
+  auto-commit: false
+
+  jdbc-url: "jdbc:h2:file:./plugins/RookiePostBox/data/rookiepostbox;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1"
+  username: "sa"
+  password: ""
+  driver: "org.h2.Driver"
+
+  pool:
+    max-size: 10
+    min-idle: 2
+    connection-timeout-ms: 30000
+    max-lifetime-ms: 1800000
+    idle-timeout-ms: 600000
+
+  log-impl: JDK_LOGGING
+  slow-sql-threshold-ms: 200
+
+config-starter:
+  enabled: true
+  virtual-threads: true
+
+  source:
+    strategy: local-first
+
+    local:
+      enabled: true
+      bootstrap-from-resource: true
+      encoding: UTF-8
+
+  cache:
+    enabled: true
+    ttl-ms: 5000
+    max-entries: 256

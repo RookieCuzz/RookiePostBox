@@ -114,3 +114,12 @@ buildNumber.properties
 run/
 test-server/
 docs/**/craft-engine/
+
+# Versioned Paper runtime dependency pack
+!dependency-pack/
+!dependency-pack/README.md
+!dependency-pack/plugins/
+!dependency-pack/plugins/*.jar
+!dependency-pack/plugins/BukkitSpring/
+!dependency-pack/plugins/BukkitSpring/starters/
+!dependency-pack/plugins/BukkitSpring/starters/*.jar

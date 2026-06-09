@@ -30,13 +30,10 @@ plugins/RookieFonts/Template/letter.yml
 plugins/RookieFonts/Template/letter_detail.yml
 ```
 
-Required plugin jars are not included in this config pack:
+Runtime jars are split this way:
 
-- `RookiePostBox`
-- `BukkitSpring`
-- `OdalitaMenus`
-- `RookieFonts`
-- `CraftEngine`
+- Build or copy the `RookiePostBox` plugin jar separately.
+- Deploy `BukkitSpring`, `OdalitaMenus`, `RookieFonts`, `CraftEngine`, and BukkitSpring starters from `dependency-pack`.
 
 After deploying CraftEngine or RookieFonts assets, restart the server or run the relevant plugin reload/build commands for the resource pack to be regenerated and sent to clients.
 
@@ -47,7 +44,7 @@ The following test-server runtime files are intentionally not included:
 - world data
 - logs
 - `.paper-remapped`
-- plugin jars
+- dependency plugin jars, which are tracked separately in `dependency-pack`
 - H2 database files under `plugins/RookiePostBox/data`
 - generated CraftEngine resource pack zip
 - unrelated plugin configs such as PlayerPoints, RoseGarden, spark, bStats, and RookieFortuneTree

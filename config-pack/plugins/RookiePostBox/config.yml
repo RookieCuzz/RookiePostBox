@@ -1,0 +1,106 @@
+rookiepostbox:
+  debug: false
+
+  database:
+    schema: public
+
+  mail:
+    page-size: 21
+    max-inbox-mails: 200
+    default-expire-days: 30
+    allow-player-send: false
+    allow-offline-send: true
+
+  claim:
+    recover-claiming-after-seconds: 120
+    enable-claim-failed-retry: true
+
+  maintenance:
+    interval-seconds: 60
+
+  notification:
+    join:
+      enabled: true
+      delay-ticks: 40
+      message: "&e邮箱提醒 &7>> &f你有 &a%unread% &f封未读邮件，输入 &b/rookiepostbox menu &f查看。"
+
+  menu:
+    title-template: letter
+    detail-title-template: letter_detail
+    buttons:
+      previous:
+        material: BRICK
+        custom-model-data: 21001
+        display-name: "&e上一页"
+        lore:
+          - "&8邮箱导航"
+          - ""
+          - "&7返回上一页邮件列表。"
+          - "&f当前页：&e%currentPage% &7/ &e%pageAmount%"
+          - ""
+          - "&a点击切换"
+      next:
+        material: BRICK
+        custom-model-data: 21002
+        display-name: "&e下一页"
+        lore:
+          - "&8邮箱导航"
+          - ""
+          - "&7查看更多邮件。"
+          - "&f当前页：&e%currentPage% &7/ &e%pageAmount%"
+          - ""
+          - "&a点击切换"
+    mail-item:
+      material: BUNDLE
+      custom-model-data: 21004
+      unread-display-name: "&6&l新邮件 &f来自 &e%sender%"
+      read-display-name: "&f邮件 &7来自 &f%sender%"
+      lore:
+        - "&8邮件编号 #%mailId%"
+        - ""
+        - "&f寄件人：&e%sender%"
+        - "&f状态：%status%"
+        - "&f发送时间：&b%createdAt%"
+        - "&f过期时间：&b%expiresAt%"
+        - ""
+        - "&f邮件内容："
+        - "&7%message%"
+        - ""
+        - "&a左键点击领取附件"
+
+mybatis:
+  enabled: true
+  debug: false
+  auto-commit: false
+
+  jdbc-url: "jdbc:h2:file:./plugins/RookiePostBox/data/rookiepostbox;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1"
+  username: "sa"
+  password: ""
+  driver: "org.h2.Driver"
+
+  pool:
+    max-size: 10
+    min-idle: 2
+    connection-timeout-ms: 30000
+    max-lifetime-ms: 1800000
+    idle-timeout-ms: 600000
+
+  log-impl: JDK_LOGGING
+  slow-sql-threshold-ms: 200
+
+config-starter:
+  enabled: true
+  virtual-threads: true
+
+  source:
+    strategy: local-first
+
+    local:
+      enabled: true
+      bootstrap-from-resource: true
+      encoding: UTF-8
+
+  cache:
+    enabled: true
+    ttl-ms: 5000
+    max-entries: 256

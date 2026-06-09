@@ -1,0 +1,58 @@
+﻿caffeine:
+  enabled: true
+  virtual-threads: true
+  default-cache-name: "default"
+  default:
+    initial-capacity: 64
+    maximum-size: 10000
+    expire-after-write-ms: 0
+    expire-after-access-ms: 0
+    refresh-after-write-ms: 0
+    weak-keys: false
+    weak-values: false
+    soft-values: false
+    record-stats: false
+  caches:
+    rookiepostbox-mailbox-page-state:
+      initial-capacity: 64
+      maximum-size: 1024
+      expire-after-access-ms: 1800000
+      record-stats: true
+
+mybatis:
+  enabled: true
+  auto-commit: false
+  jdbc-url: "jdbc:h2:file:./plugins/RookiePostBox/data/rookiepostbox;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1"
+  username: "sa"
+  password: ""
+  driver: "org.h2.Driver"
+  log-impl: "JDK_LOGGING"
+  slow-sql-threshold-ms: 200
+  pool:
+    max-size: 10
+    min-idle: 2
+    connection-timeout-ms: 30000
+    max-lifetime-ms: 1800000
+    idle-timeout-ms: 600000
+time:
+  enabled: true
+  virtual-threads: true
+  zone-id: "Asia/Shanghai"
+  debug-offset-minutes: 0
+  system-time:
+    allow-set: true
+    command-timeout-ms: 5000
+    prefer-timedatectl: true
+config-starter:
+  enabled: true
+  virtual-threads: true
+  cache:
+    enabled: true
+    ttl-ms: 5000
+    max-entries: 256
+  source:
+    strategy: "local-first"
+    local:
+      enabled: true
+      bootstrap-from-resource: true
+      encoding: "UTF-8"

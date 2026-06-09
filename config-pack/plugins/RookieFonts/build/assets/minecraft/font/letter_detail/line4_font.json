@@ -1,0 +1,153 @@
+{
+  "providers" : [ {
+    "file" : "required/null.png",
+    "chars" : [ "ꐠ" ],
+    "height" : -1,
+    "ascent" : -32768,
+    "type" : "bitmap"
+  }, {
+    "file" : "required/null.png",
+    "chars" : [ "ꐡ" ],
+    "height" : 0,
+    "ascent" : -32768,
+    "type" : "bitmap"
+  }, {
+    "file" : "required/null.png",
+    "chars" : [ "ꐢ" ],
+    "height" : 2,
+    "ascent" : -32768,
+    "type" : "bitmap"
+  }, {
+    "file" : "required/null.png",
+    "chars" : [ "ꐣ" ],
+    "height" : 6,
+    "ascent" : -32768,
+    "type" : "bitmap"
+  }, {
+    "file" : "required/null.png",
+    "chars" : [ "ꐤ" ],
+    "height" : 14,
+    "ascent" : -32768,
+    "type" : "bitmap"
+  }, {
+    "file" : "required/null.png",
+    "chars" : [ "ꐥ" ],
+    "height" : 30,
+    "ascent" : -32768,
+    "type" : "bitmap"
+  }, {
+    "file" : "required/null.png",
+    "chars" : [ "ꐦ" ],
+    "height" : 62,
+    "ascent" : -32768,
+    "type" : "bitmap"
+  }, {
+    "file" : "required/null.png",
+    "chars" : [ "ꐧ" ],
+    "height" : 126,
+    "ascent" : -32768,
+    "type" : "bitmap"
+  }, {
+    "file" : "required/null.png",
+    "chars" : [ "ꐨ" ],
+    "height" : 254,
+    "ascent" : -32768,
+    "type" : "bitmap"
+  }, {
+    "file" : "required/null.png",
+    "chars" : [ "ꐩ" ],
+    "height" : 510,
+    "ascent" : -32768,
+    "type" : "bitmap"
+  }, {
+    "file" : "required/null.png",
+    "chars" : [ "ꐪ" ],
+    "height" : 1022,
+    "ascent" : -32768,
+    "type" : "bitmap"
+  }, {
+    "file" : "required/null.png",
+    "chars" : [ "ꐫ" ],
+    "height" : -3,
+    "ascent" : -32768,
+    "type" : "bitmap"
+  }, {
+    "file" : "required/null.png",
+    "chars" : [ "ꐬ" ],
+    "height" : -4,
+    "ascent" : -32768,
+    "type" : "bitmap"
+  }, {
+    "file" : "required/null.png",
+    "chars" : [ "ꐭ" ],
+    "height" : -6,
+    "ascent" : -32768,
+    "type" : "bitmap"
+  }, {
+    "file" : "required/null.png",
+    "chars" : [ "ꐮ" ],
+    "height" : -10,
+    "ascent" : -32768,
+    "type" : "bitmap"
+  }, {
+    "file" : "required/null.png",
+    "chars" : [ "ꐯ" ],
+    "height" : -18,
+    "ascent" : -32768,
+    "type" : "bitmap"
+  }, {
+    "file" : "required/null.png",
+    "chars" : [ "ꐰ" ],
+    "height" : -34,
+    "ascent" : -32768,
+    "type" : "bitmap"
+  }, {
+    "file" : "required/null.png",
+    "chars" : [ "ꐱ" ],
+    "height" : -66,
+    "ascent" : -32768,
+    "type" : "bitmap"
+  }, {
+    "file" : "required/null.png",
+    "chars" : [ "ꐲ" ],
+    "height" : -130,
+    "ascent" : -32768,
+    "type" : "bitmap"
+  }, {
+    "file" : "required/null.png",
+    "chars" : [ "ꐳ" ],
+    "height" : -258,
+    "ascent" : -32768,
+    "type" : "bitmap"
+  }, {
+    "file" : "required/null.png",
+    "chars" : [ "ꐴ" ],
+    "height" : -514,
+    "ascent" : -32768,
+    "type" : "bitmap"
+  }, {
+    "file" : "required/null.png",
+    "chars" : [ "ꐵ" ],
+    "height" : -1026,
+    "ascent" : -32768,
+    "type" : "bitmap"
+  }, {
+    "file" : "font/letter.png",
+    "chars" : [ "" ],
+    "height" : 160,
+    "ascent" : -13.0,
+    "type" : "bitmap"
+  }, {
+    "file" : "font/ascii_custom.png",
+    "height" : 8,
+    "ascent" : -41.0,
+    "type" : "bitmap",
+    "chars" : [ "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000", "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000", " !\"#$%&'()*+,-./", "0123456789:;<=>?", "@ABCDEFGHIJKLMNO", "PQRSTUVWXYZ[\\]^_", "`abcdefghijklmno", "pqrstuvwxyz{|}~\u0000" ]
+  }, {
+    "type" : "ttf",
+    "file" : "minecraft:cube10.ttf",
+    "shift" : [ 25.0, 47.0 ],
+    "oversample" : 5.0,
+    "size" : 8.0
+  } ]
+}
